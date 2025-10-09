@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* -------------------------------
+    共通ボタンクラス
+--------------------------------*/
+.btn {
+    @apply w-full py-2 rounded text-white text-center font-medium transition;
+}
+.btn-blue {
+    @apply bg-blue-600 hover:bg-blue-700;
+}
+.btn-gray {
+    @apply bg-gray-500 hover:bg-gray-600;
+}
+.btn-red {
+    @apply bg-red-500 hover:bg-red-600;
+}
+
+/* -------------------------------
+    共通テーブルクラス
+--------------------------------*/
+.table {
+    @apply w-full border border-gray-300 rounded-lg overflow-hidden;
+}
+.table th {
+    @apply bg-gray-100 text-left px-4 py-2 border-b border-gray-300;
+}
+.table td {
+    @apply px-4 py-2 border-b border-gray-300;
+}
+.table tr:last-child td {
+    @apply border-b-0;
+}
+
+/* -------------------------------
+   共通フォーム（loginなど）
+--------------------------------*/
+.form-input {
+    @apply w-full p-2 border border-gray-300 rounded mb-4 text-sm;
+}
+.form-label {
+    @apply block font-semibold mb-1 text-gray-700;
+}
+.form-button {
+    @apply w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition;
+}
+.error-message {
+    @apply text-red-600 text-center mb-4;
+}

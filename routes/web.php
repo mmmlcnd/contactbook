@@ -1,0 +1,65 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EntryController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\AdminController;
+
+// --------------------
+// ログイン画面
+// --------------------
+Route::get('/login/student', [AuthController::class, 'studentLoginForm'])->name('login.student');
+Route::post('/login/student', [AuthController::class, 'studentLogin']);
+
+Route::get('/login/teacher', [AuthController::class, 'teacherLoginForm'])->name('login.teacher');
+Route::post('/login/teacher', [AuthController::class, 'teacherLogin']);
+
+Route::get('/login/admin', [AuthController::class, 'adminLoginForm'])->name('login.admin');
+Route::post('/login/admin', [AuthController::class, 'adminLogin']);
+
+// ログアウト
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// --------------------
+// 生徒用画面
+// --------------------
+Route::prefix('students')->middleware('auth:student')->group(function () {
+    // 生徒用ダッシュボード
+    Route::get('dashboard', [StudentController::class, 'dashboard'])->name('students.dashboard');
+    // 生徒用連絡帳入力画面
+    Route::get('entries/create', [StudentController::class, 'create'])->name('students.entries.create');
+    // 入力内容を保存するPOSTルート
+    Route::post('entries', [StudentController::class, 'store'])->name('students.entries.store');
+    // 連絡帳履歴画面
+    Route::get('entries/past', [StudentController::class, 'past'])->name('students.entries.past');
+});
+
+// --------------------
+// 教師用画面
+// --------------------
+Route::prefix('teachers')->middleware('auth:teacher')->group(function () {
+    // 教師用ダッシュボード
+    Route::get('dashboard', [TeacherController::class, 'dashboard'])->name('teachers.dashboard');
+    // 提出状況一覧画面（担当クラス）
+    Route::get('status', [TeacherController::class, 'status'])->name('teachers.status');
+    // 既読処理画面用
+    Route::get('entries/{id}/read', [TeacherController::class, 'readEntry'])->name('teachers.entries.read');
+    // 過去提出記録一覧画面（担当クラス）
+    Route::get('entries/past', [TeacherController::class, 'past'])->name('teachers.entries.past');
+});
+
+// --------------------
+// 管理者用画面
+// --------------------
+Route::prefix('admins')->middleware('auth:admin')->group(function () {
+    // 管理者用ダッシュボード
+    Route::get('dashboard', [AdminController::class, 'dashboard'])->name('admins.dashboard');
+    // 生徒・教師アカウント管理画面
+    Route::get('users', [AdminController::class, 'manageUsers'])->name('admins.users');
+    // クラス情報管理画面
+    Route::get('classes', [AdminController::class, 'manageClasses'])->name('admins.classes');
+    // 管理者・開発用提出状況一覧画面（全生徒）
+    Route::get('/entries/status', [EntryController::class, 'status'])->name('entries.status');
+});
