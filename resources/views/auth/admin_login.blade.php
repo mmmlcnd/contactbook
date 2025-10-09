@@ -1,20 +1,22 @@
-<!-- @extends('layouts.login')
+@extends('layouts.login')
 
-@section('content')
-<h2>管理者ログイン</h2>
+@section('title', '管理者ログイン')
 
-@if($errors->any())
-<div class="error-message">{{ $errors->first() }}</div>
-@endif
-
+@section('form')
 <form method="POST" action="{{ route('login.admin') }}">
     @csrf
-    <label>Email:</label>
-    <input type="email" name="email" required>
+    <div class="mb-4">
+        <label for="email" class="block text-gray-700 font-medium mb-2">メールアドレス</label>
+        <input type="email" name="email" id="email" required
+            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+    </div>
 
-    <label>Password:</label>
-    <input type="password" name="password" required>
+    <div class="mb-6">
+        <label for="password" class="block text-gray-700 font-medium mb-2">パスワード</label>
+        <input type="password" name="password" id="password" required
+            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+    </div>
 
-    <button type="submit">ログイン</button>
+    <button type="submit" class="btn btn-blue">ログイン</button>
 </form>
-@endsection -->
+@endsection

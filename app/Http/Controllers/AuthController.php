@@ -7,14 +7,28 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+    // ----------------------
+    // ログインフォーム表示
+    // ----------------------
+
+    public function studentLoginForm()
+    {
+        return view('auth.student_login');
+    }
+
+    public function teacherLoginForm()
+    {
+        return view('auth.teacher_login');
+    }
+
+    public function adminLoginForm()
+    {
+        return view('auth.admin_login');
+    }
+
     // -----------------------------
     // 生徒ログイン
     // -----------------------------
-    public function studentLoginForm()
-    {
-        $role = 'student';
-        return view('layouts.login', compact('role'));
-    }
 
     public function studentLogin(Request $request)
     {
@@ -32,11 +46,6 @@ class AuthController extends Controller
     // -----------------------------
     // 教師ログイン
     // -----------------------------
-    public function teacherLoginForm()
-    {
-        $role = 'teacher';
-        return view('layouts.login');
-    }
 
     public function teacherLogin(Request $request)
     {
@@ -54,11 +63,6 @@ class AuthController extends Controller
     // -----------------------------
     // 管理者ログイン
     // -----------------------------
-    public function adminLoginForm()
-    {
-        $role = 'admin';
-        return view('layouts.login');
-    }
 
     public function adminLogin(Request $request)
     {
