@@ -20,7 +20,7 @@ Route::get('/login/admin', [AuthController::class, 'adminLoginForm'])->name('log
 Route::post('/login/admin', [AuthController::class, 'adminLogin']);
 
 // ログアウト
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/logout/{role}', [AuthController::class, 'logout'])->name('logout');
 
 // --------------------
 // 生徒用画面

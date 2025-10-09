@@ -84,9 +84,11 @@ class AuthController extends Controller
     {
         Auth::guard($role)->logout();
 
+        // セッションを再生成してセキュリティ対策
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        // ロールに応じたログインページにリダイレクト
+        return redirect()->route('login.' . $role);
     }
 }

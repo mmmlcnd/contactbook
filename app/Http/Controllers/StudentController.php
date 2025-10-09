@@ -14,6 +14,7 @@ class StudentController extends Controller
 
     public function dashboard()
     {
+
         // ログイン中のユーザー情報を取得
         $student = Auth::user(); // Illuminate\Support\Facades\Auth を使う
 

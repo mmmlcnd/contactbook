@@ -38,6 +38,7 @@
                         ログアウト
                     </button>
                 </form>
+
                 @else
                 <a href="{{ route('login.student') }}" class="hover:underline">生徒ログイン</a>
                 <a href="{{ route('login.teacher') }}" class="hover:underline">教師ログイン</a>
