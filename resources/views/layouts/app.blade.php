@@ -15,10 +15,6 @@
     <header class="bg-blue-600 text-white p-4 shadow">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-lg font-semibold">連絡帳管理システム</h1>
-            <nav>
-                <a href="{{ url('/entries/create') }}" class="mr-4 hover:underline">連絡帳提出</a>
-                <a href="{{ url('/entries/status') }}" class="hover:underline">提出状況</a>
-            </nav>
         </div>
     </header>
 

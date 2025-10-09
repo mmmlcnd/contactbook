@@ -7,6 +7,10 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\AdminController;
 
+Route::get('/', function () {
+    return view('index');
+})->name('home');
+
 // --------------------
 // ログイン画面
 // --------------------
