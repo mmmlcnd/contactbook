@@ -18,7 +18,7 @@ class StudentController extends Controller
         // ログイン中のユーザー情報を取得
         $student = Auth::user(); // Illuminate\Support\Facades\Auth を使う
 
-        return view('students.dashboard', compact('student'));
+        return view('students.student_dashboard', compact('student'));
     }
 
     // 連絡帳入力画面

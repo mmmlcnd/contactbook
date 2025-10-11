@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminUserController;
 
 Route::get('/', function () {
     return view('index');
@@ -57,13 +58,19 @@ Route::prefix('teachers')->middleware('auth:teacher')->group(function () {
 // --------------------
 // 管理者用画面
 // --------------------
-Route::prefix('admins')->middleware('auth:admin')->group(function () {
+Route::prefix('admins')->name('admins.')->middleware('auth:admin')->group(function () {
     // 管理者用ダッシュボード
-    Route::get('dashboard', [AdminController::class, 'dashboard'])->name('admins.dashboard');
+    Route::get('dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
     // 生徒・教師アカウント管理画面
-    Route::get('users', [AdminController::class, 'manageUsers'])->name('admins.users');
-    // クラス情報管理画面
-    Route::get('classes', [AdminController::class, 'manageClasses'])->name('admins.classes');
-    // 管理者・開発用提出状況一覧画面（全生徒）
+    Route::get('users/create', [AdminUserController::class, 'showCreateUserForm'])->name('users.create');
+
+    // ユーザー作成処理
+    Route::post('users/store', [AdminUserController::class, 'storeNewUser'])->name('users.store');
+
+    // クラス情報管理画面（必要に応じて有効化）
+    Route::get('classes', [AdminController::class, 'manageClasses'])->name('classes');
+
+    // 管理者用提出状況一覧画面（全生徒）
     Route::get('/entries/status', [EntryController::class, 'status'])->name('entries.status');
 });

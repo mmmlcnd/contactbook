@@ -13,16 +13,17 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        return view('admins.dashboard');
+        return view('admins.admin_dashboard');
     }
 
+    // AdminUserControllerに記載？
     // ユーザー管理画面
-    public function manageUsers()
-    {
-        $students = Student::with('user')->get();
-        $teachers = Teacher::with('user')->get();
-        return view('admins.manage_users', compact('students', 'teachers'));
-    }
+    // public function createUsers()
+    // {
+    //     $students = Student::with('user')->get();
+    //     $teachers = Teacher::with('user')->get();
+    //     return view('admins.admin_create_user', compact('students', 'teachers'));
+    // }
 
     // クラス管理画面
     public function manageClasses()

@@ -12,7 +12,7 @@ class TeacherController extends Controller
     public function dashboard()
     {
         $teacher = Auth::user(); // Illuminate\Support\Facades\Auth を使う
-        return view('teachers.dashboard', compact('teacher'));
+        return view('teachers.teacher_dashboard', compact('teacher'));
     }
 
     public function status()

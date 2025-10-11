@@ -27,7 +27,7 @@
                 <a href="{{ route('teachers.status') }}" class="hover:underline">提出状況</a>
                 <a href="{{ route('teachers.entries.past') }}" class="hover:underline">過去提出</a>
                 @elseif($user->role === 'admin')
-                <a href="{{ route('admins.users') }}" class="hover:underline">ユーザー管理</a>
+                <a href="{{ route('admins.users.create') }}" class="hover:underline">ユーザー管理</a>
                 <a href="{{ route('admins.classes') }}" class="hover:underline">クラス管理</a>
                 <a href="{{ route('entries.status') }}" class="hover:underline">提出状況一覧</a>
                 @endif
