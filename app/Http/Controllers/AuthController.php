@@ -2,93 +2,111 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Admin;
+use App\Models\Student;
+use App\Models\Teacher;
 
-class AuthController extends Controller
+class AuthController
 {
-    // ----------------------
-    // ログインフォーム表示
-    // ----------------------
-
+    // ------------------------------
+    // ログイン画面表示
+    // ------------------------------
     public function studentLoginForm()
     {
-        return view('auth.student_login');
+        require __DIR__ . '/../resources/views/auth/student_login.php';
     }
 
     public function teacherLoginForm()
     {
-        return view('auth.teacher_login');
+        require __DIR__ . '/../resources/views/auth/teacher_login.php';
     }
 
     public function adminLoginForm()
     {
-        return view('auth.admin_login');
+        require __DIR__ . '/../resources/views/auth/admin_login.php';
     }
 
-    // -----------------------------
-    // 生徒ログイン
-    // -----------------------------
-
-    public function studentLogin(Request $request)
+    // ------------------------------
+    // ログイン処理
+    // ------------------------------
+    public function studentLogin()
     {
-        $credentials = $request->only('email', 'password');
+        $email = $_POST['email'] ?? '';
+        $password = $_POST['password'] ?? '';
 
-        // role が student のレコードだけ認証
-        if (Auth::guard('student')->attempt(array_merge($credentials, ['role' => 'student']))) {
-            $request->session()->regenerate();
-            return redirect()->route('students.dashboard');
+        $studentModel = new Student();
+        $student = $studentModel->attemptLogin($email, $password);
+
+        if ($student) {
+            session_start();
+            $_SESSION['student_id'] = $student->id;
+            header('Location: /students/dashboard');
+            exit;
+        } else {
+            $error = "メールアドレスまたはパスワードが違います。";
+            require __DIR__ . '/../resources/views/auth/student_login.php';
         }
-
-        return back()->withErrors(['email' => 'メールアドレスまたはパスワードが間違っています。']);
     }
 
-    // -----------------------------
-    // 教師ログイン
-    // -----------------------------
-
-    public function teacherLogin(Request $request)
+    public function teacherLogin()
     {
-        $credentials = $request->only('email', 'password');
+        $email = $_POST['email'] ?? '';
+        $password = $_POST['password'] ?? '';
 
-        // role が teacher のレコードだけ認証
-        if (Auth::guard('teacher')->attempt(array_merge($credentials, ['role' => 'teacher']))) {
-            $request->session()->regenerate();
-            return redirect()->route('teachers.dashboard');
+        $teacherModel = new Teacher();
+        $teacher = $teacherModel->attemptLogin($email, $password);
+
+        if ($teacher) {
+            session_start();
+            $_SESSION['teacher_id'] = $teacher->id;
+            header('Location: /teachers/dashboard');
+            exit;
+        } else {
+            $error = "メールアドレスまたはパスワードが違います。";
+            require __DIR__ . '/../resources/views/auth/teacher_login.php';
         }
-
-        return back()->withErrors(['email' => 'メールアドレスまたはパスワードが間違っています。']);
     }
 
-    // -----------------------------
-    // 管理者ログイン
-    // -----------------------------
-
-    public function adminLogin(Request $request)
+    public function adminLogin()
     {
-        $credentials = $request->only('email', 'password');
+        $email = $_POST['email'] ?? '';
+        $password = $_POST['password'] ?? '';
 
-        // role が admin のレコードだけ認証
-        if (Auth::guard('admin')->attempt(array_merge($credentials, ['role' => 'admin']))) {
-            $request->session()->regenerate();
-            return redirect()->route('admins.dashboard');
+        $adminModel = new Admin();
+        $admin = $adminModel->attemptLogin($email, $password);
+
+        if ($admin) {
+            session_start();
+            $_SESSION['admin_id'] = $admin->id;
+            header('Location: /admins/dashboard');
+            exit;
+        } else {
+            $error = "メールアドレスまたはパスワードが違います。";
+            require __DIR__ . '/../resources/views/auth/admin_login.php';
         }
-
-        return back()->withErrors(['email' => 'メールアドレスまたはパスワードが間違っています。']);
     }
 
-    // -----------------------------
-    // ログアウト
-    // -----------------------------
-    public function logout(Request $request, $role)
+    // ------------------------------
+    // ログアウト処理
+    // ------------------------------
+    public function logout()
     {
-        Auth::guard($role)->logout();
+        session_start();
+        session_unset();
+        session_destroy();
 
-        // セッションを再生成してセキュリティ対策
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        // ロールに応じたログインページにリダイレクト
-        return redirect()->route('login.' . $role);
+        // URL でどのログイン画面に戻すか判定
+        $role = $_GET['role'] ?? 'student';
+        switch ($role) {
+            case 'teacher':
+                header('Location: /login/teacher');
+                break;
+            case 'admin':
+                header('Location: /login/admin');
+                break;
+            default:
+                header('Location: /login/student');
+        }
+        exit;
     }
 }
