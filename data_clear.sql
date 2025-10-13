@@ -1,0 +1,13 @@
+DELETE FROM `read_histories`;
+DELETE FROM `entries`;
+DELETE FROM `stamps`;
+DELETE FROM `students`;
+DELETE FROM `teachers`;
+DELETE FROM `admins`;
+
+ALTER TABLE `read_histories` AUTO_INCREMENT = 1;
+ALTER TABLE `entries` AUTO_INCREMENT = 1;
+ALTER TABLE `stamps` AUTO_INCREMENT = 1;
+ALTER TABLE `students` AUTO_INCREMENT = 1;
+ALTER TABLE `teachers` AUTO_INCREMENT = 1;
+ALTER TABLE `admins` AUTO_INCREMENT = 1;
