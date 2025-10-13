@@ -4,15 +4,12 @@ namespace App\Models;
 
 use PDO;
 
-require base_path('database/db_connect.php');
-
 class Admin
 {
     protected $pdo;
 
-    public function __construct()
+    public function __construct(PDO $pdo)
     {
-        global $pdo;
         $this->pdo = $pdo;
     }
 

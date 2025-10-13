@@ -27,6 +27,12 @@
 
         {{-- フォーム --}}
         @yield('form')
+
+        <footer>
+            <a href="{{ route('home') }}" class="block text-center text-sm text-indigo-600 hover:text-indigo-500 mt-4 hover:underline transition duration-150 ease-in-out">
+                最初の画面に戻る
+            </a>
+        </footer>
     </div>
 </body>
 

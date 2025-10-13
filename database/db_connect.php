@@ -1,7 +1,7 @@
 <?php
 // DB接続情報
-$host = '127.0.0.1';           // サーバー名
-$dbname = 'contactbook';       // データベース名
+$host = 'localhost';           // サーバー名
+$dbname = 'contactbook_db';       // データベース名
 $user = 'root';                // ユーザー名（XAMPP/MAMPは通常 root）
 $pass = '';                    // パスワード（XAMPPは空、MAMPは "root"）
 
