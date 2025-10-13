@@ -2,25 +2,49 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use PDO;
 
-class Admin extends Authenticatable
+require base_path('database/db_connect.php');
+
+class Admin
 {
-    use Notifiable;
+    protected $pdo;
 
-    protected $table = 'users'; // users テーブルを使用
-    protected $guard = 'admin'; // guard 名
+    public function __construct()
+    {
+        global $pdo;
+        $this->pdo = $pdo;
+    }
 
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'role',
-    ];
+    // 管理者をIDで取得
+    public function find($id)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM admins WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_OBJ);
+    }
 
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    // メールアドレスで認証
+    public function attemptLogin($email, $password)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM admins WHERE email = ?");
+        $stmt->execute([$email]);
+        $admin = $stmt->fetch(PDO::FETCH_OBJ);
+
+        if ($admin && password_verify($password, $admin->password)) {
+            return $admin;
+        }
+
+        return null;
+    }
+
+    // 新規作成
+    public function create($data)
+    {
+        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        $stmt = $this->pdo->prepare("INSERT INTO admins (name, kana, email, password, created_at, updated_at)
+            VALUES (?, ?, ?, ?, NOW(), NOW())");
+        $stmt->execute([$data['name'], $data['kana'], $data['email'], $data['password']]);
+        return $this->pdo->lastInsertId();
+    }
 }

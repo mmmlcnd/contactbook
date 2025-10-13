@@ -2,35 +2,56 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use PDO;
 
-class Student extends Model
+require base_path('database/db_connect.php');
+
+class Student
 {
-    use HasFactory;
+    protected $pdo;
 
-    // 複数代入を許可するカラムを指定
-    protected $fillable = [
-        'user_id',
-        'class_id',
-        'student_number',
-    ];
-
-    // ユーザーとのリレーション（1対1）
-    public function user()
+    public function __construct()
     {
-        return $this->belongsTo(User::class);
+        global $pdo;
+        $this->pdo = $pdo;
     }
 
-    // クラスとのリレーション（多対1）
-    public function class()
+    public function find($id)
     {
-        return $this->belongsTo(Classes::class, 'class_id');
+        $stmt = $this->pdo->prepare("SELECT * FROM students WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_OBJ);
     }
 
-    // 連絡帳（entries）とのリレーション（1対多）
-    public function entries()
+    public function attemptLogin($email, $password)
     {
-        return $this->hasMany(Entry::class);
+        $stmt = $this->pdo->prepare("SELECT * FROM students WHERE email = ?");
+        $stmt->execute([$email]);
+        $student = $stmt->fetch(PDO::FETCH_OBJ);
+
+        if ($student && password_verify($password, $student->password)) {
+            return $student;
+        }
+
+        return null;
+    }
+
+    public function create($data)
+    {
+        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        $stmt = $this->pdo->prepare(
+            "INSERT INTO students (name, kana, email, password, grade, class, permission, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())"
+        );
+        $stmt->execute([
+            $data['name'],
+            $data['kana'],
+            $data['email'],
+            $data['password'],
+            $data['grade'],
+            $data['class'],
+            $data['permission']
+        ]);
+        return $this->pdo->lastInsertId();
     }
 }

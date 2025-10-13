@@ -41,20 +41,20 @@ return [
             'provider' => 'users',
         ],
 
-        'student' => [
-            'driver' => 'session',
-            'provider' => 'users',
-        ],
+        // 'student' => [
+        //     'driver' => 'session',
+        //     'provider' => 'users',
+        // ],
 
-        'teacher' => [
-            'driver' => 'session',
-            'provider' => 'users',
-        ],
+        // 'teacher' => [
+        //     'driver' => 'session',
+        //     'provider' => 'users',
+        // ],
 
-        'admin' => [
-            'driver' => 'session',
-            'provider' => 'users',
-        ],
+        // 'admin' => [
+        //     'driver' => 'session',
+        //     'provider' => 'users',
+        // ],
     ],
 
     /*
@@ -85,20 +85,20 @@ return [
         //     'table' => 'users',
         // ],
 
-        'students' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Student::class,
-        ],
+        // 'students' => [
+        //     'driver' => 'eloquent',
+        //     'model' => App\Models\Student::class,
+        // ],
 
-        'teachers' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Teacher::class,
-        ],
+        // 'teachers' => [
+        //     'driver' => 'eloquent',
+        //     'model' => App\Models\Teacher::class,
+        // ],
 
-        'admins' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Admin::class,
-        ],
+        // 'admins' => [
+        //     'driver' => 'eloquent',
+        //     'model' => App\Models\Admin::class,
+        // ],
     ],
 
     /*
