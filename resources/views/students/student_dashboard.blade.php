@@ -4,7 +4,7 @@
 <div class="dashboard-container">
     <h2>生徒ダッシュボード</h2>
 
-    <p>ようこそ、{{ auth()->guard('student')->user()->name}}さん</p>
+    <!-- <p>ようこそ、{{ auth()->guard('student')->user()->name}}さん</p> -->
 
     <ul>
         <li><a href="{{ route('students.entries.create') }}">連絡帳を提出する</a></li>

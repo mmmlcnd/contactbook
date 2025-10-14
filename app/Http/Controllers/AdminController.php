@@ -31,4 +31,10 @@ class AdminController extends Controller
         $classes = Classes::all();
         return view('admins.manage_classes', compact('classes'));
     }
+
+    public function nameClass()
+    {
+        $adminname = "s";
+        return view('admins.admin_create_user', compact('adminname'));
+    }
 }

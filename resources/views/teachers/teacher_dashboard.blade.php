@@ -4,7 +4,7 @@
 <div class="dashboard-container">
     <h2>教師ダッシュボード</h2>
 
-    <p>ようこそ、{{ auth()->guard('teacher')->user()->name }} 先生</p>
+    <!-- <p>ようこそ、{{ auth()->guard('teacher')->user()->name }} 先生</p> -->
 
     <ul>
         <li><a href="{{ route('teachers.status') }}">担当クラスの提出状況確認</a></li>

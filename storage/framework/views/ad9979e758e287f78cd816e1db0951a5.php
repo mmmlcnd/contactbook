@@ -1,0 +1,1 @@
+ <?php echo e($adminname); ?><?php /**PATH C:\xampp\htdocs\contactbook\resources\views/admins/admin_create_user.blade.php ENDPATH**/ ?>

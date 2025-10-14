@@ -82,12 +82,6 @@ class AuthController
         global $pdo;
         $error = null;
 
-        // 【一時的なデバッグコード開始】
-        // 1. パスワード不一致問題を回避するため、強制的に 'admin@test.com' のパスワードを 'password' のハッシュ値に更新する
-        // 削除する
-
-        // 【一時的なデバッグコード終了】
-
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
             $password = $_POST['password'] ?? '';
@@ -101,6 +95,7 @@ class AuthController
                 $_SESSION['user_id'] = $admin->id;
                 $_SESSION['user_type'] = 'admin';
 
+                // ★ リダイレクト先を /admins/dashboard に戻す
                 header("Location: /admins/dashboard");
                 exit;
             } else {
@@ -129,6 +124,7 @@ class AuthController
                 }
                 $_SESSION['user_id'] = $teacher->id;
                 $_SESSION['user_type'] = 'teacher';
+                // ★ リダイレクト先を /teachers/dashboard に戻す
                 header("Location: /teachers/dashboard");
                 exit;
             } else {
@@ -156,6 +152,7 @@ class AuthController
                 }
                 $_SESSION['user_id'] = $student->id;
                 $_SESSION['user_type'] = 'student';
+                // ★ リダイレクト先を /students/dashboard に戻す
                 header("Location: /students/dashboard");
                 exit;
             } else {
