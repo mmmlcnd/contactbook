@@ -21,8 +21,8 @@ Route::get('/admins/dashboard', function () {
 //管理者ユーザー作成画面
 Route::get('/admins/create', [AdminController::class, 'nameClass'])->name('create');
 
-// 管理者クラス管理画面（要件外）
-Route::get('/admins/classes', [AdminController::class, 'nameClass'])->name('classes');
+// 管理者クラス管理画面
+Route::get('/admins/classes', [AdminController::class, 'manageClasses'])->name('classes');
 
 // --------------------
 // ログイン画面
