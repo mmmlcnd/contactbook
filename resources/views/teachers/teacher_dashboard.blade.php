@@ -2,8 +2,8 @@
 
 @section('nav')
 <nav class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
-    <a href="{{ route('create') }}" class="hover:underline">担当クラスの提出状況確認</a>
-    <a href="{{ route('classes') }}" class="hover:underline">過去の記録確認</a>
+    <a href="{{ route('teachers.status') }}" class="hover:underline">担当クラスの提出状況確認</a>
+    <a href="{{ route('teachers.status') }}" class="hover:underline">過去の記録確認</a>
 
     <?php /* <form method="POST" action="{{ route('logout', ['role' => $user->role]) }}" class="inline">
         @csrf
@@ -28,8 +28,8 @@
     <!-- <p>ようこそ、{{ auth()->guard('student')->user()->name}}さん</p> -->*/ ?>
 
     <ul>
-        <li><a href="{{ route('students.entries.create') }}">担当クラスの提出状況確認</a></li>
-        <li><a href="{{ route('students.entries.past') }}">過去の記録確認</a></li>
+        <li><a href="{{ route('teachers.status') }}">担当クラスの提出状況確認</a></li>
+        <li><a href="{{ route('teachers.status') }}">過去の記録確認</a></li>
         <?php /* <!-- <li>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf

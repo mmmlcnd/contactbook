@@ -61,7 +61,7 @@ Route::prefix('teachers')->group(function () {
     // 教師用ダッシュボード
     Route::get('dashboard', [TeacherController::class, 'dashboard'])->name('teachers.dashboard');
     // 提出状況一覧画面（担当クラス）
-    Route::get('status', [TeacherController::class, 'status'])->name('teachers.status');
+    Route::get('status', [TeacherController::class, 'showSubmissionList'])->name('teachers.status');
     // 既読処理画面用
     Route::get('entries/{id}/read', [TeacherController::class, 'readEntry'])->name('teachers.entries.read');
     // 過去提出記録一覧画面（担当クラス）
