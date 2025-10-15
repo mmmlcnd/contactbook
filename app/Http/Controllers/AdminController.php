@@ -18,15 +18,21 @@ class AdminController extends Controller
     }
 
     // クラス管理画面表示
+    public function createUser()
+    {
+        return view('admins.admin_create_user');
+    }
+
+    // クラス管理画面表示
     public function manageClasses()
     {
         return view('admins.admin_manage_classes');
     }
 
     // テスト
-    public function nameClass()
-    {
-        $adminname = "s";
-        return view('admins.admin_create_user', compact('adminname'));
-    }
+    // public function nameClass()
+    // {
+    //     $adminname = "s";
+    //     return view('admins.admin_create_user', compact('adminname'));
+    // }
 }
