@@ -1,9 +1,7 @@
-@extends('layouts.dashboard')
-
-@section('nav')
+<?php $__env->startSection('nav'); ?>
 <nav class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
-    <a href="{{ route('create') }}" class="hover:underline">担当クラスの提出状況確認</a>
-    <a href="{{ route('classes') }}" class="hover:underline">過去の記録確認</a>
+    <a href="<?php echo e(route('create')); ?>" class="hover:underline">連絡帳を提出する</a>
+    <a href="<?php echo e(route('classes')); ?>" class="hover:underline">過去の提出記録を見る</a>
 
     <?php /* <form method="POST" action="{{ route('logout', ['role' => $user->role]) }}" class="inline">
         @csrf
@@ -18,18 +16,18 @@
     <a href="{{ route('login.admin') }}" class="hover:underline">管理者ログイン</a>
     @endif */ ?>
 </nav>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="dashboard-container">
-    <h2>教師ダッシュボード</h2>
+    <h2>生徒ダッシュボード</h2>
 
     <?php /*
     <!-- <p>ようこそ、{{ auth()->guard('student')->user()->name}}さん</p> -->*/ ?>
 
     <ul>
-        <li><a href="{{ route('students.entries.create') }}">担当クラスの提出状況確認</a></li>
-        <li><a href="{{ route('students.entries.past') }}">過去の記録確認</a></li>
+        <li><a href="<?php echo e(route('students.entries.create')); ?>">連絡帳を提出する</a></li>
+        <li><a href="<?php echo e(route('students.entries.past')); ?>">過去の提出記録を見る</a></li>
         <?php /* <!-- <li>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
@@ -40,4 +38,5 @@
 
 
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.dashboard', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\contactbook\resources\views/students/student_dashboard.blade.php ENDPATH**/ ?>
