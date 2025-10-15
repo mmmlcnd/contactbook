@@ -20,7 +20,7 @@ Route::get('/', function () {
 Route::get('/admins/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
 //管理者ユーザー作成画面
-Route::get('/admins/create', [AdminController::class, 'createUser'])->name('create');
+Route::get('/admins/create', [AdminController::class, 'showUserManagement'])->name('create');
 
 // 管理者クラス管理画面
 Route::get('/admins/classes', [AdminController::class, 'manageClasses'])->name('classes');
