@@ -10,6 +10,13 @@ if (session_status() == PHP_SESSION_NONE) {
 // index.phpの場所（public）から親ディレクトリ（..）へ移動し、database/db_connect.php を読み込みます。
 require_once __DIR__ . '/../database/db_connect.php';
 
+// ★ 新しい追加: AdminDashboardController と TeacherController を読み込む
+// (Composerのオートロードに頼らず、明示的に読み込むことで確実に動作させる)
+require_once __DIR__ . '/../app/Http/Controllers/AdminDashboardController.php';
+require_once __DIR__ . '/../app/Http/Controllers/TeacherController.php';
+// ★★★ Contoroller.php の読み込みも必須 ★★★
+require_once __DIR__ . '/../app/Http/Controllers/Controller.php';
+
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
