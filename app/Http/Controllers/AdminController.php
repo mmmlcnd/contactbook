@@ -27,15 +27,15 @@ class AdminController extends Controller
         $userType = $request->input('type', 'student'); // デフォルトは生徒
 
         // データベースからクラス一覧を取得する
-        // try {
-        //     $stmt = $pdo->prepare("SELECT id, name, grade FROM classes ORDER BY grade ASC, id ASC");
-        //     $stmt->execute();
-        //     $classes = $stmt->fetchAll(PDO::FETCH_OBJ);
-        // } catch (Exception $e) {
-        //     error_log("Failed to fetch classes: " . $e->getMessage());
-        //     $classes = []; // 失敗した場合は空の配列を渡す
-        //     $_SESSION['error'] = 'クラス一覧の取得に失敗しました。';
-        // }
+        try {
+            $stmt = $pdo->prepare("SELECT id, name, grade FROM classes ORDER BY grade ASC, id ASC");
+            $stmt->execute();
+            $classes = $stmt->fetchAll(PDO::FETCH_OBJ);
+        } catch (Exception $e) {
+            error_log("Failed to fetch classes: " . $e->getMessage());
+            $classes = []; // 失敗した場合は空の配列を渡す
+            $_SESSION['error'] = 'クラス一覧の取得に失敗しました。';
+        }
 
         // 取得したクラスデータをビューに渡す
         return view('admins.admin_create_user', compact('title', 'userType', 'classes'));
@@ -146,11 +146,13 @@ class AdminController extends Controller
             // エラーロギングとユーザーフレンドリーなメッセージ
             error_log("Database Error in createUser: " . $e->getMessage());
 
-            // ★修正: エラーメッセージを表示できるようにする
+            // エラーメッセージを表示
             return $this->redirectBackWithUserType($userType, 'ユーザー登録中にデータベースエラーが発生しました。エラーコード: ' . $e->getCode() . ' 詳細: ' . $e->getMessage());
         }
 
-        return redirect()->to('/admins/create')->with('success', $message);
+        // 成功メッセージをセッションにFlashし、リダイレクト
+        $_SESSION['success'] = $message;
+        return redirect()->to('/admins/create');
     }
 
     /**
