@@ -1,23 +1,3 @@
-<?php $__env->startSection('nav'); ?>
-<nav class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
-    <a href="<?php echo e(route('create')); ?>" class="hover:underline">連絡帳を提出する</a>
-    <a href="<?php echo e(route('classes')); ?>" class="hover:underline">過去の提出記録を見る</a>
-
-    <?php /* <form method="POST" action="{{ route('logout', ['role' => $user->role]) }}" class="inline">
-        @csrf
-        <button type="submit" class="ml-0 md:ml-4 px-3 py-1 rounded bg-red-500 hover:bg-red-600 text-white">
-            ログアウト
-        </button>
-    </form>
-
-    @else
-    <a href="{{ route('login.student') }}" class="hover:underline">生徒ログイン</a>
-    <a href="{{ route('login.teacher') }}" class="hover:underline">教師ログイン</a>
-    <a href="{{ route('login.admin') }}" class="hover:underline">管理者ログイン</a>
-    @endif */ ?>
-</nav>
-<?php $__env->stopSection(); ?>
-
 <?php $__env->startSection('content'); ?>
 <div class="dashboard-container">
     <h2>生徒ダッシュボード</h2>

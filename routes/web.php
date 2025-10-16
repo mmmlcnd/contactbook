@@ -35,9 +35,9 @@ Route::prefix('students')->group(function () {
     // 生徒用ダッシュボード
     Route::get('dashboard', [StudentController::class, 'dashboard'])->name('students.dashboard');
     // 生徒用連絡帳入力画面
-    Route::get('entries/create', [StudentController::class, 'create'])->name('students.entries.create');
+    Route::get('entries/create', [StudentController::class, 'showCreateEntryForm'])->name('students.entries.create');
     // 入力内容を保存するPOSTルート
-    Route::post('entries', [StudentController::class, 'store'])->name('students.entries.store');
+    // Route::post('entries', [StudentController::class, 'store'])->name('students.entries.store');
     // 連絡帳履歴画面
     Route::get('entries/past', [StudentController::class, 'past'])->name('students.entries.past');
 });
