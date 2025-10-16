@@ -7,11 +7,11 @@ unset($_SESSION['success'], $_SESSION['error']);
 
 @extends('layouts.app')
 
-@section('title', $title)
+@section('title', 'ユーザー作成')
 
 @section('content')
 <div class="container mx-auto p-4">
-    <h1 class="text-3xl font-bold mb-6 text-gray-800">{{ $title }}</h1>
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">ユーザー作成</h1>
 
     {{-- メッセージ表示エリア --}}
     @if ($success)
@@ -29,7 +29,7 @@ unset($_SESSION['success'], $_SESSION['error']);
     <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
         <h2 class="text-2xl font-semibold mb-4 border-b pb-2 text-gray-700">新規ユーザー作成</h2>
 
-        <form method="POST" action="/admins/users/create" class="space-y-6">
+        <form method="POST" action="/admins/create" class="space-y-6">
             @csrf
 
             {{-- ユーザータイプ選択 --}}
@@ -59,28 +59,39 @@ unset($_SESSION['success'], $_SESSION['error']);
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
             </div>
 
-            {{-- 生徒・教師共通フィールド --}}
-            <div id="name_field" style="<?php echo $userType === 'admin' ? 'display: none;' : 'display: block;'; ?>">
+            {{-- 氏名フィールド (管理者も表示、全ユーザーで必須) --}}
+            <div id="name_field">
                 <label for="name" class="block text-sm font-medium text-gray-700">氏名</label>
                 <input type="text" id="name" name="name"
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
             </div>
 
-            <div id="grade_field" style="<?php echo $userType === 'admin' ? 'display: none;' : 'display: block;'; ?>">
-                <label for="grade" class="block text-sm font-medium text-gray-700 mb-1">学年</label>
-                <input type="number" id="grade" name="grade" min="1" max="6"
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="例: 3">
+            {{-- フリガナ（kana）フィールド (管理者も表示、全ユーザーで必須) --}}
+            <div id="kana_field">
+                <label for="kana" class="block text-sm font-medium text-gray-700">フリガナ (カナ)</label>
+                <input type="text" id="kana" name="kana"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="例: ヤマダタロウ">
             </div>
 
+            {{-- クラスIDフィールド (生徒・教師のみ必須、管理者非表示) --}}
             <div id="class_id_field" style="<?php echo $userType === 'admin' ? 'display: none;' : 'display: block;'; ?>">
-                <label for="class_id" class="block text-sm font-medium text-gray-700 mb-1">クラス</label>
-                <input type="number" id="class_id" name="class_id" min="1"
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="例: 1 (1年A組などに対応)">
-                <p class="mt-1 text-xs text-gray-500">
-                    ※ クラス管理機能で登録したIDを入力してください。
-                </p>
+                <label for="class_id" class="block text-sm font-medium text-gray-700 mb-1">所属クラス (学年/クラス)</label>
+                <select id="class_id" name="class_id"
+                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm">
+                    <option value="" disabled selected>学年・クラスを選択してください</option>
+
+                    {{-- $classes 変数 (id, name, grade を持つ) はコントローラから渡されることを想定 --}}
+                    @if (!empty($classes))
+                    @foreach ($classes as $class)
+                    <option value="{{ $class->id }}">
+                        {{ $class->grade }}年 {{ $class->name }}
+                    </option>
+                    @endforeach
+                    @else
+                    <option value="" disabled>クラス情報がありません</option>
+                    @endif
+                </select>
             </div>
 
             <div>
@@ -100,12 +111,16 @@ unset($_SESSION['success'], $_SESSION['error']);
 
     /**
      * ユーザータイプ（生徒/教師/管理者）に応じて、フォームフィールドの表示・非表示を切り替えます。
+     * また、必須属性を動的に設定します。
      */
     function toggleFields() {
         const userType = document.getElementById('user_type').value;
 
         const nameField = document.getElementById('name_field');
         const nameInput = document.getElementById('name');
+
+        const kanaField = document.getElementById('kana_field');
+        const kanaInput = document.getElementById('kana');
 
         const gradeField = document.getElementById('grade_field');
         const gradeInput = document.getElementById('grade');
@@ -115,24 +130,31 @@ unset($_SESSION['success'], $_SESSION['error']);
 
         // デフォルトで全ての必須属性をリセット
         nameInput.removeAttribute('required');
+        kanaInput.removeAttribute('required'); // kanaもリセット
         classIdInput.removeAttribute('required');
+        gradeInput.removeAttribute('required');
+
+        // nameFieldとkanaFieldは常に表示されている
 
         if (userType === 'student' || userType === 'teacher') {
-            // 生徒の場合: grade, class_id を表示し、必須とする
-            nameField.style.display = 'block';
+            // 生徒・教師の場合: 氏名、フリガナ、学年、クラスを必須とする
             nameInput.setAttribute('required', 'required');
-            gradeField.style.display = 'block';
+            kanaInput.setAttribute('required', 'required');
             gradeInput.setAttribute('required', 'required');
-            classIdField.style.display = 'block';
             classIdInput.setAttribute('required', 'required');
+
+            // 学年とクラスIDを表示
+            gradeField.style.display = 'block';
+            classIdField.style.display = 'block';
+
         } else {
-            // admin の場合: 非表示にし、必須属性を削除
-            nameField.style.display = 'none';
-            nameInput.removeAttribute('required');
+            // admin の場合: 氏名、フリガナを必須とする
+            nameInput.setAttribute('required', 'required');
+            kanaInput.setAttribute('required', 'required');
+
+            // 学年、クラスIDは非表示にする
             gradeField.style.display = 'none';
-            gradeInput.removeAttribute('required');
             classIdField.style.display = 'none';
-            classIdInput.removeAttribute('required');
         }
     }
 </script>
