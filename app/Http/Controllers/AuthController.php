@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-// データベース接続（$pdo）はグローバル変数として利用可能であることを前提とする
-
-class AuthController
+class AuthController extends Controller
 {
     // 認証ログの出力先設定
     private const LOG_FILE = '/debug_auth.log';
@@ -22,12 +20,6 @@ class AuthController
             error_log("DB接続がありません。", 3, $logPath);
             return null;
         }
-
-        // --- ログイン試行のデバッグログ ---
-        error_log("\n--- " . date('Y-m-d H:i:s') . " ログイン試行 ---", 3, $logPath);
-        error_log("テーブル: " . $table, 3, $logPath);
-        error_log("入力されたメール: " . $email, 3, $logPath);
-        error_log("入力されたパスワード: " . $password, 3, $logPath);
 
         if (empty($email) || empty($password)) {
             return null;
@@ -54,10 +46,12 @@ class AuthController
                 error_log("認証失敗: ユーザーが見つかりません。", 3, $logPath);
             }
         } catch (\PDOException $e) {
+            // データベースエラーが発生した場合
+            // デバッグログではなく、システムの標準エラーログに出力
             error_log("データベースエラー: " . $e->getMessage(), 3, $logPath);
         }
 
-        return null;
+        return null; // 認証失敗
     }
 
     // ログインフォーム表示用のラッパーメソッド
@@ -77,7 +71,7 @@ class AuthController
     }
 
     // Admin ログイン処理 (フォーム表示とPOST処理)
-    public function adminLogin(): string | null
+    public function adminLogin()
     {
         global $pdo;
         $error = null;
@@ -109,7 +103,7 @@ class AuthController
     }
 
     // Teacher ログイン処理
-    public function teacherLogin(): string | null
+    public function teacherLogin()
     {
         global $pdo;
         $error = null;
@@ -137,7 +131,7 @@ class AuthController
     }
 
     // Student ログイン処理
-    public function studentLogin(): string | null
+    public function studentLogin()
     {
         global $pdo;
         $error = null;
@@ -165,26 +159,26 @@ class AuthController
     }
 
     // ログアウト処理
-    public function logout(): void
-    {
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
-        $_SESSION = array();
-        if (ini_get("session.use_cookies")) {
-            $params = session_get_cookie_params();
-            setcookie(
-                session_name(),
-                '',
-                time() - 42000,
-                $params["path"],
-                $params["domain"],
-                $params["secure"],
-                $params["httponly"]
-            );
-        }
-        session_destroy();
-        header("Location: /");
-        exit;
-    }
+    // public function logout(): void
+    // {
+    //     if (session_status() == PHP_SESSION_NONE) {
+    //         session_start();
+    //     }
+    //     $_SESSION = array();
+    //     if (ini_get("session.use_cookies")) {
+    //         $params = session_get_cookie_params();
+    //         setcookie(
+    //             session_name(),
+    //             '',
+    //             time() - 42000,
+    //             $params["path"],
+    //             $params["domain"],
+    //             $params["secure"],
+    //             $params["httponly"]
+    //         );
+    //     }
+    //     session_destroy();
+    //     header("Location: /");
+    //     exit;
+    // }
 }
