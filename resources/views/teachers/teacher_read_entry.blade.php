@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.dashboard')
 
 @section('title', '連絡帳確認 - ' . $entry->student_name)
 
