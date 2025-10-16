@@ -6,55 +6,6 @@ use App\Models\Auth;
 
 class AuthController extends Controller
 {
-    // 認証ログの出力先設定
-    private const LOG_FILE = '/debug_auth.log';
-
-    // 認証ロジックをまとめたプライベートメソッド（PDO, SQL使用）
-    // protected function attemptLogin(string $table, ?string $email, ?string $password): ?\stdClass
-    // {
-    //     global $pdo;
-
-    //     // ログファイルのパスを動的に計算 (プロジェクトルート/debug_auth.log)
-    //     // ログタイプ 3 は、指定されたファイルにメッセージを追加します。
-    //     $logPath = dirname(dirname(dirname(__DIR__))) . self::LOG_FILE;
-
-    //     if (!$pdo) {
-    //         error_log("DB接続がありません。", 3, $logPath);
-    //         return null;
-    //     }
-
-    //     if (empty($email) || empty($password)) {
-    //         return null;
-    //     }
-
-    //     try {
-    //         // メールアドレスでユーザーレコードを取得
-    //         $stmt = $pdo->prepare("SELECT * FROM `{$table}` WHERE email = :email");
-    //         $stmt->execute([':email' => $email]);
-    //         $user = $stmt->fetch(\PDO::FETCH_OBJ);
-
-    //         if ($user) {
-    //             error_log("DB取得ユーザーID: " . $user->id, 3, $logPath);
-    //             error_log("DBハッシュ値: " . $user->password, 3, $logPath);
-
-    //             // パスワードの検証
-    //             if (password_verify($password, $user->password)) {
-    //                 error_log("認証成功！", 3, $logPath);
-    //                 return $user;
-    //             } else {
-    //                 error_log("認証失敗: パスワード不一致。", 3, $logPath);
-    //             }
-    //         } else {
-    //             error_log("認証失敗: ユーザーが見つかりません。", 3, $logPath);
-    //         }
-    //     } catch (\PDOException $e) {
-    //         // データベースエラーが発生した場合
-    //         // デバッグログではなく、システムの標準エラーログに出力
-    //         error_log("データベースエラー: " . $e->getMessage(), 3, $logPath);
-    //     }
-
-    //     return null; // 認証失敗
-    // }
 
     // ログインフォーム表示用のラッパーメソッド
     public function studentLoginForm()
@@ -117,11 +68,17 @@ class AuthController extends Controller
         global $pdo;
         $error = null;
 
+        // Authモデルのインスタンス化
+        $authModel = new Auth();
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
             $password = $_POST['password'] ?? '';
 
-            if ($teacher = $this->attemptLogin('teachers', $email, $password)) {
+            $attemptLogin = $authModel->attemptLogin('teachers', $email, $password);
+
+
+            if ($teacher = $attemptLogin) {
                 if (session_status() == PHP_SESSION_NONE) {
                     session_start();
                 }
@@ -145,11 +102,17 @@ class AuthController extends Controller
         global $pdo;
         $error = null;
 
+        // Authモデルのインスタンス化
+        $authModel = new Auth();
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
             $password = $_POST['password'] ?? '';
 
-            if ($student = $this->attemptLogin('students', $email, $password)) {
+            $attemptLogin = $authModel->attemptLogin('students', $email, $password);
+
+
+            if ($student = $attemptLogin) {
                 if (session_status() == PHP_SESSION_NONE) {
                     session_start();
                 }
