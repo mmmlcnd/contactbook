@@ -14,14 +14,10 @@
             @yield('title')
         </h2>
 
-        {{-- エラーメッセージ --}}
-        @if ($errors->any())
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
-            <ul class="list-disc ml-5">
-                @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+        {{-- AuthControllerから渡された $error 変数を Blade 構文で表示する --}}
+        @if (isset($error) && $error)
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm font-medium">
+            {{ $error }}
         </div>
         @endif
 
