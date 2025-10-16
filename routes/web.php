@@ -13,19 +13,6 @@ Route::get('/', function () {
     return view('index');
 })->name('home');
 
-//管理者ダッシュボード画面
-// Route::get('/admins/dashboard', function () {
-//     return view('admins/admin_dashboard');
-// });
-Route::get('/admins/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-
-//管理者ユーザー作成画面
-Route::get('/admins/create', [AdminController::class, 'showUserManagement'])->name('create');
-Route::post('/admins/create', [AdminController::class, 'createUser']);
-
-// 管理者クラス管理画面
-Route::get('/admins/classes', [AdminController::class, 'manageClasses'])->name('classes');
-
 // --------------------
 // ログイン画面
 // --------------------
@@ -78,17 +65,14 @@ Route::prefix('teachers')->group(function () {
 // --------------------
 Route::prefix('admins')->group(function () {
     // 管理者用ダッシュボード
-    Route::get('dashboard', [AdminController::class, 'dashboard'])->name('admins.dashboard');
+    Route::get('dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    // Route::get('/admins/dashboard', function () {
+    //     return view('admins/admin_dashboard');
+    // });
 
-    // 生徒・教師アカウント管理画面
-    Route::get('users/create', [AdminUserController::class, 'showCreateUserForm'])->name('users.create');
-
-    // ユーザー作成処理
-    Route::post('users/store', [AdminUserController::class, 'storeNewUser'])->name('users.store');
-
-    // クラス情報管理画面）
+    //管理者ユーザー作成画面
+    Route::get('create', [AdminController::class, 'showUserManagement'])->name('create');
+    Route::post('create', [AdminController::class, 'createUser']);
+    // 管理者クラス管理画面
     Route::get('classes', [AdminController::class, 'manageClasses'])->name('classes');
-
-    // 管理者用提出状況一覧画面（全生徒）
-    Route::get('/entries/status', [EntryController::class, 'status'])->name('entries.status');
 });
