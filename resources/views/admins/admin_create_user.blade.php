@@ -5,7 +5,7 @@ $error = $_SESSION['error'] ?? null;
 unset($_SESSION['success'], $_SESSION['error']);
 ?>
 
-@extends('layouts.app')
+@extends('layouts.dashboard')
 
 @section('title', 'ユーザー作成')
 

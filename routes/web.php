@@ -37,7 +37,7 @@ Route::prefix('students')->group(function () {
     // 生徒用連絡帳入力画面
     Route::get('entries/create', [StudentController::class, 'showCreateEntryForm'])->name('students.entries.create');
     // 入力内容を保存するPOSTルート
-    // Route::post('entries', [StudentController::class, 'store'])->name('students.entries.store');
+    Route::post('entries/create', [StudentController::class, 'createEntry']);
     // 連絡帳履歴画面
     Route::get('entries/past', [StudentController::class, 'past'])->name('students.entries.past');
 });
@@ -65,13 +65,13 @@ Route::prefix('teachers')->group(function () {
 // --------------------
 Route::prefix('admins')->group(function () {
     // 管理者用ダッシュボード
-    Route::get('dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('dashboard', [AdminController::class, 'dashboard'])->name('admins.dashboard');
     // Route::get('/admins/dashboard', function () {
     //     return view('admins/admin_dashboard');
     // });
 
     //管理者ユーザー作成画面
-    Route::get('create', [AdminController::class, 'showUserManagement'])->name('create');
+    Route::get('create', [AdminController::class, 'showUserManagement'])->name('admins.create');
     Route::post('create', [AdminController::class, 'createUser']);
     // 管理者クラス管理画面
     Route::get('classes', [AdminController::class, 'manageClasses'])->name('classes');

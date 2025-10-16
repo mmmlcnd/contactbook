@@ -2,57 +2,59 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Auth;
+
 class AuthController extends Controller
 {
     // 認証ログの出力先設定
     private const LOG_FILE = '/debug_auth.log';
 
     // 認証ロジックをまとめたプライベートメソッド（PDO, SQL使用）
-    protected function attemptLogin(string $table, ?string $email, ?string $password): ?\stdClass
-    {
-        global $pdo;
+    // protected function attemptLogin(string $table, ?string $email, ?string $password): ?\stdClass
+    // {
+    //     global $pdo;
 
-        // ログファイルのパスを動的に計算 (プロジェクトルート/debug_auth.log)
-        // ログタイプ 3 は、指定されたファイルにメッセージを追加します。
-        $logPath = dirname(dirname(dirname(__DIR__))) . self::LOG_FILE;
+    //     // ログファイルのパスを動的に計算 (プロジェクトルート/debug_auth.log)
+    //     // ログタイプ 3 は、指定されたファイルにメッセージを追加します。
+    //     $logPath = dirname(dirname(dirname(__DIR__))) . self::LOG_FILE;
 
-        if (!$pdo) {
-            error_log("DB接続がありません。", 3, $logPath);
-            return null;
-        }
+    //     if (!$pdo) {
+    //         error_log("DB接続がありません。", 3, $logPath);
+    //         return null;
+    //     }
 
-        if (empty($email) || empty($password)) {
-            return null;
-        }
+    //     if (empty($email) || empty($password)) {
+    //         return null;
+    //     }
 
-        try {
-            // メールアドレスでユーザーレコードを取得
-            $stmt = $pdo->prepare("SELECT * FROM `{$table}` WHERE email = :email");
-            $stmt->execute([':email' => $email]);
-            $user = $stmt->fetch(\PDO::FETCH_OBJ);
+    //     try {
+    //         // メールアドレスでユーザーレコードを取得
+    //         $stmt = $pdo->prepare("SELECT * FROM `{$table}` WHERE email = :email");
+    //         $stmt->execute([':email' => $email]);
+    //         $user = $stmt->fetch(\PDO::FETCH_OBJ);
 
-            if ($user) {
-                error_log("DB取得ユーザーID: " . $user->id, 3, $logPath);
-                error_log("DBハッシュ値: " . $user->password, 3, $logPath);
+    //         if ($user) {
+    //             error_log("DB取得ユーザーID: " . $user->id, 3, $logPath);
+    //             error_log("DBハッシュ値: " . $user->password, 3, $logPath);
 
-                // パスワードの検証
-                if (password_verify($password, $user->password)) {
-                    error_log("認証成功！", 3, $logPath);
-                    return $user;
-                } else {
-                    error_log("認証失敗: パスワード不一致。", 3, $logPath);
-                }
-            } else {
-                error_log("認証失敗: ユーザーが見つかりません。", 3, $logPath);
-            }
-        } catch (\PDOException $e) {
-            // データベースエラーが発生した場合
-            // デバッグログではなく、システムの標準エラーログに出力
-            error_log("データベースエラー: " . $e->getMessage(), 3, $logPath);
-        }
+    //             // パスワードの検証
+    //             if (password_verify($password, $user->password)) {
+    //                 error_log("認証成功！", 3, $logPath);
+    //                 return $user;
+    //             } else {
+    //                 error_log("認証失敗: パスワード不一致。", 3, $logPath);
+    //             }
+    //         } else {
+    //             error_log("認証失敗: ユーザーが見つかりません。", 3, $logPath);
+    //         }
+    //     } catch (\PDOException $e) {
+    //         // データベースエラーが発生した場合
+    //         // デバッグログではなく、システムの標準エラーログに出力
+    //         error_log("データベースエラー: " . $e->getMessage(), 3, $logPath);
+    //     }
 
-        return null; // 認証失敗
-    }
+    //     return null; // 認証失敗
+    // }
 
     // ログインフォーム表示用のラッパーメソッド
     public function studentLoginForm()
@@ -70,17 +72,24 @@ class AuthController extends Controller
         return $this->adminLogin();
     }
 
+
+
     // Admin ログイン処理 (フォーム表示とPOST処理)
     public function adminLogin()
     {
         global $pdo;
         $error = null;
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Authモデルのインスタンス化
+        $authModel = new Auth();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') { // サーバーへのPOSTリクエストが送られたら
             $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
             $password = $_POST['password'] ?? '';
 
-            if ($admin = $this->attemptLogin('admins', $email, $password)) {
+            $attemptLogin = $authModel->attemptLogin('admins', $email, $password);
+
+            if ($admin = $attemptLogin) {
 
                 if (session_status() == PHP_SESSION_NONE) {
                     session_start();
@@ -90,7 +99,7 @@ class AuthController extends Controller
                 $_SESSION['user_type'] = 'admin';
 
                 // ★ リダイレクト先を /admins/dashboard に戻す
-                header("Location: /admins/dashboard");
+                return redirect()->route('admins.dashboard');
                 exit;
             } else {
                 $error = 'メールアドレスまたはパスワードが間違っています。';

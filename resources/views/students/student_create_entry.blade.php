@@ -51,13 +51,13 @@ $reportDateText = $reportDate->format('Y年m月d日');
         @endif
 
         {{-- 連絡帳提出フォーム --}}
-        <form action="/students/entry/create" method="POST" class="space-y-8">
+        <form action="/students/entries/create" method="POST" class="space-y-8">
             <input type="hidden" name="_method" value="POST">
 
             <!-- 身体的コンディション -->
             <div class="form-group p-4 border border-gray-200 rounded-lg">
                 <label for="condition_physical" class="block text-xl font-bold text-gray-700 mb-3">
-                    1. 身体的コンディション
+                    1. 体調
                     <span class="text-sm font-normal text-gray-500 block">（5: 絶好調 〜 1: 体調不良）</span>
                 </label>
                 <input type="range" id="condition_physical" name="condition_physical" min="1" max="5" value="5" oninput="updateConditionValue('physical', this.value)"
@@ -74,7 +74,7 @@ $reportDateText = $reportDate->format('Y年m月d日');
             <!-- 精神的コンディション -->
             <div class="form-group p-4 border border-gray-200 rounded-lg">
                 <label for="condition_mental" class="block text-xl font-bold text-gray-700 mb-3">
-                    2. 精神的コンディション
+                    2. メンタル
                     <span class="text-sm font-normal text-gray-500 block">（5: 非常に良い 〜 1: 落ち込んでいる）</span>
                 </label>
                 <input type="range" id="condition_mental" name="condition_mental" min="1" max="5" value="5" oninput="updateConditionValue('mental', this.value)"
@@ -84,7 +84,7 @@ $reportDateText = $reportDate->format('Y年m月d日');
                     <span>5 (非常に良い)</span>
                 </div>
                 <div class="mt-3 text-center">
-                    現在の評価: <span id="mental_value" class="text-2xl font-extrabold text-purple-600">5</span>
+                    現在の評価: <span id="mental_value" class="text-2xl font-extrabold text-blue-600">5</span>
                 </div>
             </div>
 

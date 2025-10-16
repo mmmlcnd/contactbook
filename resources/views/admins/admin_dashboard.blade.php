@@ -10,7 +10,7 @@
     <p>ようこそ、さん</p>
 
     <ul>
-        <li><a href="{{ route('create') }}">生徒・教師アカウント管理</a></li>
+        <li><a href="{{ route('admins.create') }}">生徒・教師アカウント管理</a></li>
 
         <?php /* <li><a href="{{ route('classes') }}">クラス管理</a></li>
 

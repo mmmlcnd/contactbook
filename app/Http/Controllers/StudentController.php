@@ -33,7 +33,7 @@ class StudentController extends Controller
     {
         if (!$this->getStudentId()) {
             // 未認証またはロールが異なる場合はログインページへリダイレクト
-            header('Location: /students/login');
+            header('Location: /login/students');
             exit;
             return false;
         }
@@ -56,21 +56,8 @@ class StudentController extends Controller
         if (!$this->checkAuth()) return;
 
         // F-4.1: 連絡帳提出フォームを表示
-        return view('students/student_create_entry', ['title' => '連絡帳提出']);
+        return view('students.student_create_entry', ['title' => '連絡帳提出']);
     }
-
-
-    // public function create()
-    // {
-    //     // 仮にログイン中の生徒を取得（PoC用）
-    //     $student = Student::where('user_id', Auth::id())->first();
-
-    //     if (!$student) {
-    //         return "生徒データが見つかりません。";
-    //     }
-
-    //     return view('students.create_entry', compact('student'));
-    // }
 
     /**
      * 連絡帳をデータベースに保存する
@@ -90,7 +77,7 @@ class StudentController extends Controller
         // バリデーション
         if ($physical === false || $mental === false || $physical < 1 || $physical > 5 || $mental < 1 || $mental > 5 || empty($content)) {
             $_SESSION['error_message'] = '入力内容に誤りがあります。体調評価(1-5)と連絡内容が必須です。';
-            header('Location: /students/entry/create');
+            header('Location: /students/entries/create');
             exit;
         }
 
@@ -102,7 +89,7 @@ class StudentController extends Controller
             $stmtCheck->execute([$studentId, $recordDate]);
             if ($stmtCheck->fetchColumn() > 0) {
                 $_SESSION['error_message'] = '本日は既に連絡帳を提出済みです。';
-                header('Location: /students/entry/create');
+                header('Location: /students/entries/create');
                 exit;
             }
 
@@ -125,7 +112,7 @@ class StudentController extends Controller
             $_SESSION['error_message'] = 'データの保存中にエラーが発生しました。時間を置いて再度お試しください。';
         }
 
-        header('Location: /students/entry/create');
+        header('Location: /students/entries/create');
         exit;
     }
 
