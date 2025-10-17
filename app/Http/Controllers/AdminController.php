@@ -24,7 +24,7 @@ class AdminController extends Controller
         global $pdo;
 
         $title = 'ユーザー管理';
-        $userType = $request->input('type', 'admin');
+        $userType = $request->input('type', 'admin'); // デフォルトは生徒
 
         // データベースからクラス一覧を取得する
         try {
