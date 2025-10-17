@@ -24,7 +24,7 @@ class AdminController extends Controller
     {
 
         $title = 'ユーザー管理';
-        $userType = $request->input('type', 'admin'); // デフォルトは生徒
+        $userType = $request->input('type', 'admin');
 
         $classesModel = new Classes();
 
@@ -50,6 +50,8 @@ class AdminController extends Controller
     public function createUser(Request $request)
     {
         global $pdo; // PDOインスタンスを使用
+
+        $classesModel = new Classes();
 
         // 認証チェック
         if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
@@ -80,10 +82,13 @@ class AdminController extends Controller
                     return $this->redirectBackWithUserType($userType, '学年とクラスの選択は必須です。');
                 }
 
+                $result = $classesModel->getGradesAndNames();
+                $classData = $result;
+
                 // classesテーブルからgradeとnameを取得
-                $stmt = $pdo->prepare("SELECT grade, name FROM classes WHERE id = :classId");
-                $stmt->execute(['classId' => $classId]);
-                $classData = $stmt->fetch(PDO::FETCH_ASSOC);
+                // $stmt = $pdo->prepare("SELECT grade, name FROM classes WHERE id = :classId");
+                // $stmt->execute(['classId' => $classId]);
+                // $classData = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 if (!$classData) {
                     return $this->redirectBackWithUserType($userType, '指定されたクラスIDは無効です。');

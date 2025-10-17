@@ -8,6 +8,7 @@ use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\Classes;
 use App\Models\Entry;
+use App\Models\Admin;
 use PDO;
 use Exception;
 
@@ -21,16 +22,15 @@ class AdminController extends Controller
 
     public function showUserManagement(Request $request)
     {
-        global $pdo;
 
         $title = 'ユーザー管理';
-        $userType = $request->input('type', 'admin'); // デフォルトは生徒
+        $userType = $request->input('type', 'admin');
 
-        // データベースからクラス一覧を取得する
+        $classesModel = new Classes();
+
         try {
-            $stmt = $pdo->prepare("SELECT id, name, grade FROM classes ORDER BY grade ASC, id ASC");
-            $stmt->execute();
-            $classes = $stmt->fetchAll(PDO::FETCH_OBJ);
+            $result = $classesModel->getAllOrderedClasses();
+            $classes = $result;
         } catch (Exception $e) {
             error_log("Failed to fetch classes: " . $e->getMessage());
             $classes = []; // 失敗した場合は空の配列を渡す
@@ -50,6 +50,8 @@ class AdminController extends Controller
     public function createUser(Request $request)
     {
         global $pdo; // PDOインスタンスを使用
+
+        $classesModel = new Classes();
 
         // 認証チェック
         if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
@@ -80,10 +82,12 @@ class AdminController extends Controller
                     return $this->redirectBackWithUserType($userType, '学年とクラスの選択は必須です。');
                 }
 
+                $classData = $classesModel->getGradesAndNames();
+
                 // classesテーブルからgradeとnameを取得
-                $stmt = $pdo->prepare("SELECT grade, name FROM classes WHERE id = :classId");
-                $stmt->execute(['classId' => $classId]);
-                $classData = $stmt->fetch(PDO::FETCH_ASSOC);
+                // $stmt = $pdo->prepare("SELECT grade, name FROM classes WHERE id = :classId");
+                // $stmt->execute(['classId' => $classId]);
+                // $classData = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 if (!$classData) {
                     return $this->redirectBackWithUserType($userType, '指定されたクラスIDは無効です。');
