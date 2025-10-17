@@ -40,17 +40,4 @@ class Classes extends Model
 
         return $classes;
     }
-
-    public function getGradesAndNames()
-    {
-        global $pdo;
-        $classId = '';
-
-        // classesテーブルからgradeとnameを取得
-        $stmt = $pdo->prepare("SELECT grade, name FROM classes WHERE id = :classId");
-        $stmt->execute(['classId' => $classId]);
-        $classData = [$stmt->fetch(PDO::FETCH_ASSOC)];
-
-        return $classData;
-    }
 }
