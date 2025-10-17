@@ -2,12 +2,12 @@
 // Laravelのセッションヘルパーを使用
 $success = session('success');
 $error = session('error');
+// フラッシュデータや一時データをクリア
 session()->forget(['success', 'error', 'user_type_temp']);
 
-// フォームの選択状態を保持するための変数 (コントローラーから渡される)
-$selectedUserType = $userType ?? 'admin'; // 'admin'はコントローラーで必ず渡される前提
-// ログインユーザー種別は、セッションから直接取得 (レイアウトファイルでナビゲーションに使用)
-$loggedInUserType = session('user_type');
+// コントローラーから $selectedUserType が渡されない場合に備えてデフォルト値を設定
+// コントローラーから渡される場合は、その値をそのまま使用
+$selectedUserType = $selectedUserType ?? 'student';
 ?>
 
 
@@ -34,7 +34,7 @@ $loggedInUserType = session('user_type');
     <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
         <h2 class="text-2xl font-semibold mb-4 border-b pb-2 text-gray-700">新規ユーザー作成</h2>
 
-        <form method="POST" action="/admins/create" class="space-y-6">
+        <form method="POST" action="<?php echo e(url('/admins/create')); ?>" class="space-y-6">
             <?php echo csrf_field(); ?>
 
             
@@ -44,9 +44,10 @@ $loggedInUserType = session('user_type');
                     <select id="user_type" name="user_type" required
                         class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm"
                         onchange="toggleFields()">
-                        <option value="student" <?php echo $selectedUserType === 'student' ? 'selected' : ''; ?>>生徒</option>
-                        <option value="teacher" <?php echo $selectedUserType === 'teacher' ? 'selected' : ''; ?>>教師</option>
-                        <option value="admin" <?php echo $selectedUserType === 'admin' ? 'selected' : ''; ?>>管理者</option>
+                        
+                        <option value="student" <?php echo e($selectedUserType === 'student' ? 'selected' : ''); ?>>生徒</option>
+                        <option value="teacher" <?php echo e($selectedUserType === 'teacher' ? 'selected' : ''); ?>>教師</option>
+                        <option value="admin" <?php echo e($selectedUserType === 'admin' ? 'selected' : ''); ?>>管理者</option>
                     </select>
                 </div>
             </div>
@@ -54,7 +55,8 @@ $loggedInUserType = session('user_type');
             
             <div>
                 <label for="email" class="block text-sm font-medium text-gray-700">メールアドレス</label>
-                <input type="email" id="email" name="email" required
+                
+                <input type="email" id="email" name="email" required value="<?php echo e(old('email')); ?>"
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
             </div>
 
@@ -67,30 +69,30 @@ $loggedInUserType = session('user_type');
             
             <div id="name_field">
                 <label for="name" class="block text-sm font-medium text-gray-700">氏名</label>
-                <input type="text" id="name" name="name"
+                <input type="text" id="name" name="name" value="<?php echo e(old('name')); ?>"
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
             </div>
 
             
             <div id="kana_field">
                 <label for="kana" class="block text-sm font-medium text-gray-700">フリガナ (カナ)</label>
-                <input type="text" id="kana" name="kana"
+                <input type="text" id="kana" name="kana" value="<?php echo e(old('kana')); ?>"
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500"
                     placeholder="例: ヤマダタロウ">
             </div>
 
             
-            <div id="class_id_field" style="<?php echo $selectedUserType === 'admin' ? 'display: none;' : 'display: block;'; ?>">
+            
+            <div id="class_id_field" style="<?php echo e($selectedUserType === 'admin' ? 'display: none;' : 'display: block;'); ?>">
                 <label for="class_id" class="block text-sm font-medium text-gray-700 mb-1">所属クラス (学年/クラス)</label>
                 <select id="class_id" name="class_id"
                     class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm">
-                    <option value="" disabled selected>学年・クラスを選択してください</option>
-
+                    <option value="" disabled <?php echo e(old('class_id') == null ? 'selected' : ''); ?>>学年・クラスを選択してください</option>
                     
                     <?php if(!empty($classes)): ?>
                     <?php $__currentLoopData = $classes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $class): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <option value="<?php echo e($class->id); ?>">
-                        <?php echo e($class->grade); ?>年 <?php echo e($class->name); ?>
+                    
+                    <option value="<?php echo e($class->id); ?>" <?php echo e(old('class_id') == $class->id ? 'selected' : ''); ?>> <?php echo e($class->grade); ?>年 <?php echo e($class->name); ?>
 
                     </option>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -122,35 +124,26 @@ $loggedInUserType = session('user_type');
     function toggleFields() {
         const selectedUserType = document.getElementById('user_type').value;
 
-        const nameField = document.getElementById('name_field');
         const nameInput = document.getElementById('name');
-
-        const kanaField = document.getElementById('kana_field');
         const kanaInput = document.getElementById('kana');
 
-        const gradeField = document.getElementById('grade_field');
-        const gradeInput = document.getElementById('grade');
-
+        // 💡 存在しない grade_field, gradeInput の制御は削除しました。
         const classIdField = document.getElementById('class_id_field');
         const classIdInput = document.getElementById('class_id');
 
         // デフォルトで全ての必須属性をリセット
         nameInput.removeAttribute('required');
-        kanaInput.removeAttribute('required'); // kanaもリセット
+        kanaInput.removeAttribute('required');
         classIdInput.removeAttribute('required');
-        gradeInput.removeAttribute('required');
-
-        // nameFieldとkanaFieldは常に表示されている
+        // gradeInputの制御は削除
 
         if (selectedUserType === 'student' || selectedUserType === 'teacher') {
-            // 生徒・教師の場合: 氏名、フリガナ、学年、クラスを必須とする
+            // 生徒・教師の場合: 氏名、フリガナ、クラスを必須とする
             nameInput.setAttribute('required', 'required');
             kanaInput.setAttribute('required', 'required');
-            gradeInput.setAttribute('required', 'required');
             classIdInput.setAttribute('required', 'required');
 
-            // 学年とクラスIDを表示
-            gradeField.style.display = 'block';
+            // クラスIDフィールドを表示
             classIdField.style.display = 'block';
 
         } else {
@@ -158,8 +151,7 @@ $loggedInUserType = session('user_type');
             nameInput.setAttribute('required', 'required');
             kanaInput.setAttribute('required', 'required');
 
-            // 学年、クラスIDは非表示にする
-            gradeField.style.display = 'none';
+            // クラスIDフィールドは非表示
             classIdField.style.display = 'none';
         }
     }
