@@ -24,18 +24,25 @@ class AdminController extends Controller
         global $pdo;
 
         $title = 'ユーザー管理';
-        $userType = $request->input('type', 'student'); // デフォルトは生徒
+        $userType = $request->input(
+            'type',
+            $request->session()->get('user_type_temp', 'admin') // セッションヘルパーを使用);
+        );
+
+        // エラー回復後はセッションの一時値を削除
+        $request->session()->forget('user_type_temp');
 
         // データベースからクラス一覧を取得する
-        try {
-            $stmt = $pdo->prepare("SELECT id, name, grade FROM classes ORDER BY grade ASC, id ASC");
-            $stmt->execute();
-            $classes = $stmt->fetchAll(PDO::FETCH_OBJ);
-        } catch (Exception $e) {
-            error_log("Failed to fetch classes: " . $e->getMessage());
-            $classes = []; // 失敗した場合は空の配列を渡す
-            $_SESSION['error'] = 'クラス一覧の取得に失敗しました。';
-        }
+        $classes = []; // 仮の値
+        // try {
+        //     $stmt = $pdo->prepare("SELECT id, name, grade FROM classes ORDER BY grade ASC, id ASC");
+        //     $stmt->execute();
+        //     $classes = $stmt->fetchAll(PDO::FETCH_OBJ);
+        // } catch (Exception $e) {
+        //     error_log("Failed to fetch classes: " . $e->getMessage());
+        //     $classes = []; // 失敗した場合は空の配列を渡す
+        //     $_SESSION['error'] = 'クラス一覧の取得に失敗しました。';
+        // }
 
         // 取得したクラスデータをビューに渡す
         return view('admins.admin_create_user', compact('title', 'userType', 'classes'));

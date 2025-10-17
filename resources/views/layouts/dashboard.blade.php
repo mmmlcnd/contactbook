@@ -15,7 +15,7 @@
         <div class="container mx-auto flex flex-col md:flex-row justify-between items-center p-4">
             <h1 class="text-xl font-semibold mb-2 md:mb-0">連絡帳管理システム</h1>
 
-            {{-- 【修正箇所】ロールに応じたナビゲーションを表示するロジック --}}
+            {{-- ロールに応じたナビゲーションを表示するロジック --}}
             @php
             // コントローラーから渡される変数 $userType を使用
             $role = $userType ?? ($_SESSION['user_type'] ?? null);
@@ -32,7 +32,7 @@
                 <a href="/admins/dashboard" class="hover:bg-indigo-700 p-2 rounded transition duration-150 flex items-center">
                     <i class="fas fa-chart-line mr-1"></i> ダッシュボード
                 </a>
-                <a href="/admins/users/create" class="hover:bg-indigo-700 p-2 rounded transition duration-150 flex items-center">
+                <a href="/admins/create" class="hover:bg-indigo-700 p-2 rounded transition duration-150 flex items-center">
                     <i class="fas fa-users-cog mr-1"></i> ユーザー管理
                 </a>
                 <!-- <a href="/admins/classes/manage" class="hover:bg-indigo-700 p-2 rounded transition duration-150 flex items-center">

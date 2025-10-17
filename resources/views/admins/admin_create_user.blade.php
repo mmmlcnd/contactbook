@@ -1,9 +1,14 @@
-<?php
-// セッションからメッセージを取得
-$success = $_SESSION['success'] ?? null;
-$error = $_SESSION['error'] ?? null;
-unset($_SESSION['success'], $_SESSION['error']);
-?>
+@php
+// Laravelのセッションヘルパーを使用
+$success = session('success');
+$error = session('error');
+session()->forget(['success', 'error', 'user_type_temp']);
+
+// フォームの選択状態を保持するための変数 (コントローラーから渡される)
+$selectedUserType = $userType ?? 'admin'; // 'admin'はコントローラーで必ず渡される前提
+// ログインユーザー種別は、セッションから直接取得 (レイアウトファイルでナビゲーションに使用)
+$loggedInUserType = session('user_type');
+@endphp
 
 @extends('layouts.dashboard')
 
@@ -39,9 +44,9 @@ unset($_SESSION['success'], $_SESSION['error']);
                     <select id="user_type" name="user_type" required
                         class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm"
                         onchange="toggleFields()">
-                        <option value="student" <?php echo $userType === 'student' ? 'selected' : ''; ?>>生徒</option>
-                        <option value="teacher" <?php echo $userType === 'teacher' ? 'selected' : ''; ?>>教師</option>
-                        <option value="admin" <?php echo $userType === 'admin' ? 'selected' : ''; ?>>管理者</option>
+                        <option value="student" <?php echo $selectedUserType === 'student' ? 'selected' : ''; ?>>生徒</option>
+                        <option value="teacher" <?php echo $selectedUserType === 'teacher' ? 'selected' : ''; ?>>教師</option>
+                        <option value="admin" <?php echo $selectedUserType === 'admin' ? 'selected' : ''; ?>>管理者</option>
                     </select>
                 </div>
             </div>
@@ -75,7 +80,7 @@ unset($_SESSION['success'], $_SESSION['error']);
             </div>
 
             {{-- クラスIDフィールド (生徒・教師のみ必須、管理者非表示) --}}
-            <div id="class_id_field" style="<?php echo $userType === 'admin' ? 'display: none;' : 'display: block;'; ?>">
+            <div id="class_id_field" style="<?php echo $selectedUserType === 'admin' ? 'display: none;' : 'display: block;'; ?>">
                 <label for="class_id" class="block text-sm font-medium text-gray-700 mb-1">所属クラス (学年/クラス)</label>
                 <select id="class_id" name="class_id"
                     class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm">
@@ -114,7 +119,7 @@ unset($_SESSION['success'], $_SESSION['error']);
      * また、必須属性を動的に設定します。
      */
     function toggleFields() {
-        const userType = document.getElementById('user_type').value;
+        const selectedUserType = document.getElementById('user_type').value;
 
         const nameField = document.getElementById('name_field');
         const nameInput = document.getElementById('name');
@@ -136,7 +141,7 @@ unset($_SESSION['success'], $_SESSION['error']);
 
         // nameFieldとkanaFieldは常に表示されている
 
-        if (userType === 'student' || userType === 'teacher') {
+        if (selectedUserType === 'student' || selectedUserType === 'teacher') {
             // 生徒・教師の場合: 氏名、フリガナ、学年、クラスを必須とする
             nameInput.setAttribute('required', 'required');
             kanaInput.setAttribute('required', 'required');

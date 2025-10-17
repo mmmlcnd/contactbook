@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+// use Illuminate\Database\Eloquent\Model;
+
 use PDO;
 
-class Admin
+class Admin //extends Model
 {
     protected $pdo;
 
