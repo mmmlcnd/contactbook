@@ -8,6 +8,8 @@ session()->forget(['success', 'error', 'user_type_temp']);
 // コントローラーから $selectedUserType が渡されない場合に備えてデフォルト値を設定
 // コントローラーから渡される場合は、その値をそのまま使用
 $selectedUserType = $selectedUserType ?? 'student';
+
+$classes = $classes ?? [];
 ?>
 
 
@@ -44,7 +46,6 @@ $selectedUserType = $selectedUserType ?? 'student';
                     <select id="user_type" name="user_type" required
                         class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm"
                         onchange="toggleFields()">
-                        
                         <option value="student" <?php echo e($selectedUserType === 'student' ? 'selected' : ''); ?>>生徒</option>
                         <option value="teacher" <?php echo e($selectedUserType === 'teacher' ? 'selected' : ''); ?>>教師</option>
                         <option value="admin" <?php echo e($selectedUserType === 'admin' ? 'selected' : ''); ?>>管理者</option>
@@ -83,16 +84,17 @@ $selectedUserType = $selectedUserType ?? 'student';
 
             
             
-            <div id="class_id_field" style="<?php echo e($selectedUserType === 'admin' ? 'display: none;' : 'display: block;'); ?>">
+            <?php if($selectedUserType !== 'admin'): ?>
+            <div id="class_id_field">
                 <label for="class_id" class="block text-sm font-medium text-gray-700 mb-1">所属クラス (学年/クラス)</label>
                 <select id="class_id" name="class_id"
                     class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm">
                     <option value="" disabled <?php echo e(old('class_id') == null ? 'selected' : ''); ?>>学年・クラスを選択してください</option>
-                    
                     <?php if(!empty($classes)): ?>
                     <?php $__currentLoopData = $classes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $class): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     
-                    <option value="<?php echo e($class->id); ?>" <?php echo e(old('class_id') == $class->id ? 'selected' : ''); ?>> <?php echo e($class->grade); ?>年 <?php echo e($class->name); ?>
+                    <option value="<?php echo e($class->id); ?>" <?php echo e(old('class_id') == $class->id ? 'selected' : ''); ?>>
+                        <?php echo e($class->grade); ?>年 <?php echo e($class->name); ?>
 
                     </option>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -101,6 +103,7 @@ $selectedUserType = $selectedUserType ?? 'student';
                     <?php endif; ?>
                 </select>
             </div>
+            <?php endif; ?>
 
             <div>
                 <button type="submit" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">

@@ -8,6 +8,8 @@ session()->forget(['success', 'error', 'user_type_temp']);
 // コントローラーから $selectedUserType が渡されない場合に備えてデフォルト値を設定
 // コントローラーから渡される場合は、その値をそのまま使用
 $selectedUserType = $selectedUserType ?? 'student';
+
+$classes = $classes ?? [];
 @endphp
 
 @extends('layouts.dashboard')
@@ -44,7 +46,6 @@ $selectedUserType = $selectedUserType ?? 'student';
                     <select id="user_type" name="user_type" required
                         class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm"
                         onchange="toggleFields()">
-                        {{-- Blade記法でselected属性を制御 --}}
                         <option value="student" {{ $selectedUserType === 'student' ? 'selected' : '' }}>生徒</option>
                         <option value="teacher" {{ $selectedUserType === 'teacher' ? 'selected' : '' }}>教師</option>
                         <option value="admin" {{ $selectedUserType === 'admin' ? 'selected' : '' }}>管理者</option>
@@ -83,16 +84,17 @@ $selectedUserType = $selectedUserType ?? 'student';
 
             {{-- クラスIDフィールド (生徒・教師のみ必須、管理者非表示) --}}
             {{-- 💡 Blade記法と $selectedUserType で初期表示を制御 --}}
-            <div id="class_id_field" style="{{ $selectedUserType === 'admin' ? 'display: none;' : 'display: block;' }}">
+            @if ($selectedUserType !== 'admin')
+            <div id="class_id_field">
                 <label for="class_id" class="block text-sm font-medium text-gray-700 mb-1">所属クラス (学年/クラス)</label>
                 <select id="class_id" name="class_id"
                     class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm">
                     <option value="" disabled {{ old('class_id') == null ? 'selected' : '' }}>学年・クラスを選択してください</option>
-                    {{-- $classes 変数 (id, name, grade を持つ) はコントローラから渡されることを想定 --}}
                     @if (!empty($classes))
                     @foreach ($classes as $class)
                     {{-- old() ヘルパーでエラー後の選択状態を保持 --}}
-                    <option value="{{ $class->id }}" {{ old('class_id') == $class->id ? 'selected' : '' }}> {{ $class->grade }}年 {{ $class->name }}
+                    <option value="{{ $class->id }}" {{ old('class_id') == $class->id ? 'selected' : '' }}>
+                        {{ $class->grade }}年 {{ $class->name }}
                     </option>
                     @endforeach
                     @else
@@ -100,6 +102,7 @@ $selectedUserType = $selectedUserType ?? 'student';
                     @endif
                 </select>
             </div>
+            @endif
 
             <div>
                 <button type="submit" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
