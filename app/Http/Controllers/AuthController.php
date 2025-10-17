@@ -37,6 +37,7 @@ class AuthController extends Controller
             $password = $_POST['password'] ?? '';
 
             // Postされたデータを取得
+            // 変数名変える
             $attemptLogin = $authModel->attemptLogin('admins', $email, $password);
 
             if ($admin = $attemptLogin) {

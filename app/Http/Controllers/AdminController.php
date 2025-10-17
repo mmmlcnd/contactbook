@@ -22,16 +22,15 @@ class AdminController extends Controller
 
     public function showUserManagement(Request $request)
     {
-        global $pdo;
 
         $title = 'ユーザー管理';
         $userType = $request->input('type', 'admin'); // デフォルトは生徒
 
-        // データベースからクラス一覧を取得する
+        $classesModel = new Classes();
+
         try {
-            $stmt = $pdo->prepare("SELECT id, name, grade FROM classes ORDER BY grade ASC, id ASC");
-            $stmt->execute();
-            $classes = $stmt->fetchAll(PDO::FETCH_OBJ);
+            $result = $classesModel->getAllOrderedClasses();
+            $classes = $result;
         } catch (Exception $e) {
             error_log("Failed to fetch classes: " . $e->getMessage());
             $classes = []; // 失敗した場合は空の配列を渡す

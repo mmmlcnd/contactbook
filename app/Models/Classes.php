@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Exception;
+use PDO;
 
 class Classes extends Model
 {
@@ -25,5 +27,17 @@ class Classes extends Model
     public function teachers()
     {
         return $this->hasMany(Teacher::class, 'class_id');
+    }
+
+    // クラス一覧を取得する
+    public function getAllOrderedClasses()
+    {
+        global $pdo;
+
+        $stmt = $pdo->prepare("SELECT id, name, grade FROM classes ORDER BY grade ASC, id ASC");
+        $stmt->execute();
+        $classes = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return $classes;
     }
 }
