@@ -108,7 +108,7 @@ class AdminController extends Controller
                     $stmt = $pdo->prepare("INSERT INTO students (email, password, name, kana, grade, class, permission) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
                     // class_idをclassカラムへ、permissionをwriteで設定
-                    $stmt->execute([$email, $hashedPassword, $name, $studentKana, $grade, $classId, 'write']);
+                    $stmt->execute([$email, $hashedPassword, $name, $studentKana, $grade, $className, 'write']);
                     $message = '生徒ユーザー（' . htmlspecialchars($name) . '）が登録されました。';
                     break;
 
@@ -122,7 +122,7 @@ class AdminController extends Controller
 
                     // DBスキーマ (email, password, name, kana, grade, class) に合わせる
                     $stmt = $pdo->prepare("INSERT INTO teachers (email, password, name, kana, grade, class) VALUES (?, ?, ?, ?, ?, ?)");
-                    $stmt->execute([$email, $hashedPassword, $name, $teacherKana, $grade, $classId]);
+                    $stmt->execute([$email, $hashedPassword, $name, $teacherKana, $grade, $className]);
 
                     $message = '教師ユーザー（' . htmlspecialchars($name) . '）が登録されました。';
                     break;
