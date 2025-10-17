@@ -23,8 +23,6 @@ class AuthController extends Controller
         return $this->adminLogin();
     }
 
-
-
     // Admin ログイン処理 (フォーム表示とPOST処理)
     public function adminLogin()
     {
@@ -38,6 +36,7 @@ class AuthController extends Controller
             $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
             $password = $_POST['password'] ?? '';
 
+            // Postされたデータを取得
             $attemptLogin = $authModel->attemptLogin('admins', $email, $password);
 
             if ($admin = $attemptLogin) {
@@ -85,7 +84,7 @@ class AuthController extends Controller
                 $_SESSION['user_id'] = $teacher->id;
                 $_SESSION['user_type'] = 'teacher';
                 // ★ リダイレクト先を /teachers/dashboard に戻す
-                header("Location: /teachers/dashboard");
+                return redirect()->route('teachers.dashboard');
                 exit;
             } else {
                 $error = 'メールアドレスまたはパスワードが間違っています。';
@@ -119,7 +118,7 @@ class AuthController extends Controller
                 $_SESSION['user_id'] = $student->id;
                 $_SESSION['user_type'] = 'student';
                 // ★ リダイレクト先を /students/dashboard に戻す
-                header("Location: /students/dashboard");
+                return redirect()->route('students.dashboard');
                 exit;
             } else {
                 $error = 'メールアドレスまたはパスワードが間違っています。';

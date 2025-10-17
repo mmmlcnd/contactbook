@@ -23,6 +23,7 @@ Route::get('/login/teacher', [AuthController::class, 'teacherLoginForm'])->name(
 Route::post('/login/teacher', [AuthController::class, 'teacherLogin']);
 
 Route::get('/login/admin', [AuthController::class, 'adminLoginForm'])->name('login.admin');
+// URLで/login/adminが指定された場合、POSTされたデータを下記のコントローラーのadminLogin関数に飛ばしている
 Route::post('/login/admin', [AuthController::class, 'adminLogin']);
 
 // ログアウト

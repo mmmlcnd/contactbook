@@ -8,14 +8,6 @@ use PDO;
 
 class Admin extends Model
 {
-
-    protected $fillable = [
-        'name',
-        'kana',
-        'email',
-        'password'
-    ];
-
     protected $pdo;
 
     public function __construct(PDO $pdo)
@@ -30,6 +22,20 @@ class Admin extends Model
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_OBJ);
     }
+
+    // メールアドレスで認証※Auth.phpに記述
+    // public function attemptLogin($email, $password)
+    // {
+    //     $stmt = $this->pdo->prepare("SELECT * FROM admins WHERE email = ?");
+    //     $stmt->execute([$email]);
+    //     $admin = $stmt->fetch(PDO::FETCH_OBJ);
+
+    //     if ($admin && password_verify($password, $admin->password)) {
+    //         return $admin;
+    //     }
+
+    //     return null;
+    // }
 
     // 新規作成
     public function create($data) // 新しいレコードをデータベースに作成

@@ -8,7 +8,6 @@ use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\Classes;
 use App\Models\Entry;
-use App\Models\Admin;
 use PDO;
 use Exception;
 
