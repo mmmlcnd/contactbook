@@ -3,14 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\Student;
-use App\Models\Teacher;
 use App\Models\Classes;
-use App\Models\Entry;
-use App\Models\Admin;
-use PDO;
 use Exception;
+// use App\Models\User;
+// use App\Models\Student;
+// use App\Models\Teacher;
+// use App\Models\Entry;
+// use App\Models\Admin;
+
 
 class AdminController extends Controller
 {
@@ -70,6 +70,8 @@ class AdminController extends Controller
         // パスワードのハッシュ化
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
+        $classesModel = new Classes();
+
         try {
             // 教師・生徒登録の場合、クラスIDの検証とクラス情報（学年・クラス名）の取得を行う
             if ($userType === 'student' || $userType === 'teacher') {
@@ -77,8 +79,6 @@ class AdminController extends Controller
                 if (empty($classId)) {
                     return $this->redirectBackWithUserType($userType, '学年とクラスの選択は必須です。');
                 }
-
-                $classesModel = new Classes();
 
                 $classData = $classesModel->getGradesAndNames($classId);
 
@@ -93,15 +93,12 @@ class AdminController extends Controller
             }
             switch ($userType) {
                 case 'student':
-                    // 生徒登録
                     // バリデーション: 学年 (Grade)、クラスIDは必須
                     if (empty($grade) || empty($classId)) {
                         return $this->redirectBackWithUserType($userType, '生徒の学年 (Grade)、クラスIDは必須です。');
                     }
 
-                    $classesModel = new Classes();
-
-                    $classesModel->insertStudentOrTeacher($email, $hashedPassword, $name, $kana, $grade, $className, 'write');
+                    $classesModel->insertStudentOrTeacher('students', $email, $hashedPassword, $name, $kana, $grade, $className, 'write');
 
                     $message = '生徒ユーザー（' . htmlspecialchars($name) . '）が登録されました。';
                     break;
@@ -112,17 +109,12 @@ class AdminController extends Controller
                         return $this->redirectBackWithUserType($userType, '教師の学年 (Grade)、クラスIDは必須です。');
                     }
 
-                    $classesModel = new Classes();
-
-                    $classesModel->insertStudentOrTeacher($email, $hashedPassword, $name, $kana, $grade, $className, 'read');
+                    $classesModel->insertStudentOrTeacher('teachers', $email, $hashedPassword, $name, $kana, $grade, $className, 'read');
 
                     $message = '教師ユーザー（' . htmlspecialchars($name) . '）が登録されました。';
                     break;
 
                 case 'admin':
-
-                    $classesModel = new Classes();
-
                     $classesModel->insertAdmin($email, $hashedPassword, $name, $kana);
 
                     $message = '管理者ユーザー（' . htmlspecialchars($email) . '）が登録されました。';

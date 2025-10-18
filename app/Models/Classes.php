@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Exception;
 use PDO;
+// use App\Models\Exception;
 
 class Classes extends Model
 {
@@ -49,16 +49,18 @@ class Classes extends Model
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function insertStudentOrTeacher($email, $hashedPassword, $name, $kana, $grade, $className, $permission)
+    // 生徒・教師データ挿入
+    public function insertStudentOrTeacher($table, $email, $hashedPassword, $name, $kana, $grade, $className, $permission)
     {
         global $pdo;
 
         // DBスキーマ (id, name, kana, email, password, grade, class, permission) に合わせる
-        $stmt = $pdo->prepare("INSERT INTO teachers (email, password, name, kana, grade, class, permission) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO `{$table}` (email, password, name, kana, grade, class, permission) VALUES (?, ?, ?, ?, ?, ?, ?)");
         // class_idをclassカラムへ、permissionをwriteで設定
         $stmt->execute([$email, $hashedPassword, $name, $kana, $grade, $className, $permission]);
     }
 
+    // 管理者データ挿入
     public function insertAdmin($email, $hashedPassword, $name, $kana)
     {
         global $pdo;
