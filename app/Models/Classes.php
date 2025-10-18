@@ -48,4 +48,33 @@ class Classes extends Model
         $stmt->execute(['classId' => $classId]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function insertStudent($email, $hashedPassword, $name, $kana, $grade, $className)
+    {
+        global $pdo;
+
+        // DBスキーマ (id, name, kana, email, password, grade, class, permission) に合わせる
+        $stmt = $pdo->prepare("INSERT INTO students (email, password, name, kana, grade, class, permission) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        // class_idをclassカラムへ、permissionをwriteで設定
+        $stmt->execute([$email, $hashedPassword, $name, $kana, $grade, $className, 'write']);
+    }
+
+    public function insertTeacher($email, $hashedPassword, $name, $kana, $grade, $className)
+    {
+        global $pdo;
+
+        // DBスキーマ (id, name, kana, email, password, grade, class, permission) に合わせる
+        $stmt = $pdo->prepare("INSERT INTO teachers (email, password, name, kana, grade, class, permission) VALUES (?, ?, ?, ?, ?, ?)");
+        // class_idをclassカラムへ、permissionをreadで設定
+        $stmt->execute([$email, $hashedPassword, $name, $kana, $grade, $className, 'read']);
+    }
+
+    public function insertAdmin($email, $hashedPassword, $name, $kana)
+    {
+        global $pdo;
+
+        // DBスキーマ (id, name, kana, email, password) に合わせる
+        $stmt = $pdo->prepare("INSERT INTO admins (email, password, name, kana) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$email, $hashedPassword, $name, $kana]);
+    }
 }

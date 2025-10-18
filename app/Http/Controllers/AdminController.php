@@ -48,9 +48,6 @@ class AdminController extends Controller
      */
     public function createUser(Request $request)
     {
-        // あとで消す
-        global $pdo; // PDOインスタンスを使用
-
         // 認証チェック
         if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
             return redirect()->to('/login/admins')->with('error', '管理者としてログインしてください。');
@@ -101,12 +98,10 @@ class AdminController extends Controller
                     if (empty($grade) || empty($classId)) {
                         return $this->redirectBackWithUserType($userType, '生徒の学年 (Grade)、クラスIDは必須です。');
                     }
-                    // Modelの処理
-                    // DBスキーマ (id, name, kana, email, password, grade, class, permission) に合わせる
-                    $stmt = $pdo->prepare("INSERT INTO students (email, password, name, kana, grade, class, permission) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
-                    // class_idをclassカラムへ、permissionをwriteで設定
-                    $stmt->execute([$email, $hashedPassword, $name, $kana, $grade, $className, 'write']);
+                    $classesModel = new Classes();
+
+                    $classesModel->insertStudent($email, $hashedPassword, $name, $kana, $grade, $className);
 
                     $message = '生徒ユーザー（' . htmlspecialchars($name) . '）が登録されました。';
                     break;
@@ -117,23 +112,18 @@ class AdminController extends Controller
                         return $this->redirectBackWithUserType($userType, '教師の学年 (Grade)、クラスIDは必須です。');
                     }
 
-                    // Modelの処理
-                    // DBスキーマ (email, password, name, kana, grade, class) に合わせる
-                    $stmt = $pdo->prepare("INSERT INTO teachers (email, password, name, kana, grade, class) VALUES (?, ?, ?, ?, ?, ?)");
-                    $stmt->execute([$email, $hashedPassword, $name, $kana, $grade, $className]);
+                    $classesModel = new Classes();
+
+                    $classesModel->insertTeacher($email, $hashedPassword, $name, $kana, $grade, $className);
 
                     $message = '教師ユーザー（' . htmlspecialchars($name) . '）が登録されました。';
                     break;
 
                 case 'admin':
-                    // 管理者登録
-                    // nameとkanaは共通バリデーションで必須化済み
-                    $adminName = $name;
-                    $adminKana = $kana;
 
-                    // Modelの処理（メインの登録処理）
-                    $stmt = $pdo->prepare("INSERT INTO admins (email, password, name, kana) VALUES (?, ?, ?, ?)");
-                    $stmt->execute([$email, $hashedPassword, $adminName, $adminKana]);
+                    $classesModel = new Classes();
+
+                    $classesModel->insertAdmin($email, $hashedPassword, $name, $kana);
 
                     $message = '管理者ユーザー（' . htmlspecialchars($email) . '）が登録されました。';
                     break;
