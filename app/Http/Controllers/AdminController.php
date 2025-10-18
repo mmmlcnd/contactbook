@@ -29,8 +29,7 @@ class AdminController extends Controller
         $classesModel = new Classes();
 
         try {
-            $result = $classesModel->getAllOrderedClasses();
-            $classes = $result;
+            $classes = $classesModel->getAllOrderedClasses();
         } catch (Exception $e) {
             error_log("Failed to fetch classes: " . $e->getMessage());
             $classes = []; // 失敗した場合は空の配列を渡す
@@ -49,7 +48,8 @@ class AdminController extends Controller
      */
     public function createUser(Request $request)
     {
-        // global $pdo; // PDOインスタンスを使用
+        // あとで消す
+        global $pdo; // PDOインスタンスを使用
 
         // 認証チェック
         if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
@@ -76,16 +76,14 @@ class AdminController extends Controller
         try {
             // 教師・生徒登録の場合、クラスIDの検証とクラス情報（学年・クラス名）の取得を行う
             if ($userType === 'student' || $userType === 'teacher') {
-                // Modelの処理
+                // Modelの処理？？
                 if (empty($classId)) {
                     return $this->redirectBackWithUserType($userType, '学年とクラスの選択は必須です。');
                 }
 
-                // classesテーブルからgradeとnameを取得
+                $classesModel = new Classes();
 
-                $stmt = $pdo->prepare("SELECT grade, name FROM classes WHERE id = :classId");
-                $stmt->execute(['classId' => $classId]);
-                $classData = $stmt->fetch(PDO::FETCH_ASSOC);
+                $classData = $classesModel->getGradesAndNames($classId);
 
                 if (!$classData) {
                     return $this->redirectBackWithUserType($userType, '指定されたクラスIDは無効です。');
@@ -103,15 +101,13 @@ class AdminController extends Controller
                     if (empty($grade) || empty($classId)) {
                         return $this->redirectBackWithUserType($userType, '生徒の学年 (Grade)、クラスIDは必須です。');
                     }
-
-                    $studentKana = $kana;
-
                     // Modelの処理
                     // DBスキーマ (id, name, kana, email, password, grade, class, permission) に合わせる
                     $stmt = $pdo->prepare("INSERT INTO students (email, password, name, kana, grade, class, permission) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
                     // class_idをclassカラムへ、permissionをwriteで設定
-                    $stmt->execute([$email, $hashedPassword, $name, $studentKana, $grade, $className, 'write']);
+                    $stmt->execute([$email, $hashedPassword, $name, $kana, $grade, $className, 'write']);
+
                     $message = '生徒ユーザー（' . htmlspecialchars($name) . '）が登録されました。';
                     break;
 
@@ -121,12 +117,10 @@ class AdminController extends Controller
                         return $this->redirectBackWithUserType($userType, '教師の学年 (Grade)、クラスIDは必須です。');
                     }
 
-                    $teacherKana = $kana;
-
                     // Modelの処理
                     // DBスキーマ (email, password, name, kana, grade, class) に合わせる
                     $stmt = $pdo->prepare("INSERT INTO teachers (email, password, name, kana, grade, class) VALUES (?, ?, ?, ?, ?, ?)");
-                    $stmt->execute([$email, $hashedPassword, $name, $teacherKana, $grade, $className]);
+                    $stmt->execute([$email, $hashedPassword, $name, $kana, $grade, $className]);
 
                     $message = '教師ユーザー（' . htmlspecialchars($name) . '）が登録されました。';
                     break;

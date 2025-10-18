@@ -67,8 +67,8 @@ class AuthController extends Controller
             $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
             $password = $_POST['password'] ?? '';
 
+            // 変数変える
             $attemptLogin = $authModel->attemptLogin('teachers', $email, $password);
-
 
             if ($attemptLogin == true) {
                 // ★ リダイレクト先を /teachers/dashboard に戻す

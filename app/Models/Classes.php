@@ -36,8 +36,16 @@ class Classes extends Model
 
         $stmt = $pdo->prepare("SELECT id, name, grade FROM classes ORDER BY grade ASC, id ASC");
         $stmt->execute();
-        $classes = $stmt->fetchAll(PDO::FETCH_OBJ);
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
 
-        return $classes;
+    // classesテーブルからgradeとnameを取得
+    public function getGradesAndNames(int $classId)
+    {
+        global $pdo;
+
+        $stmt = $pdo->prepare("SELECT grade, name FROM classes WHERE id = :classId");
+        $stmt->execute(['classId' => $classId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }
