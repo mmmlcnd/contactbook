@@ -101,7 +101,7 @@ class AdminController extends Controller
 
                     $classesModel = new Classes();
 
-                    $classesModel->insertStudent($email, $hashedPassword, $name, $kana, $grade, $className);
+                    $classesModel->insertStudentOrTeacher($email, $hashedPassword, $name, $kana, $grade, $className, 'write');
 
                     $message = '生徒ユーザー（' . htmlspecialchars($name) . '）が登録されました。';
                     break;
@@ -114,7 +114,7 @@ class AdminController extends Controller
 
                     $classesModel = new Classes();
 
-                    $classesModel->insertTeacher($email, $hashedPassword, $name, $kana, $grade, $className);
+                    $classesModel->insertStudentOrTeacher($email, $hashedPassword, $name, $kana, $grade, $className, 'read');
 
                     $message = '教師ユーザー（' . htmlspecialchars($name) . '）が登録されました。';
                     break;
@@ -161,11 +161,4 @@ class AdminController extends Controller
     {
         return view('admins.admin_manage_classes');
     }
-
-    // テスト
-    // public function nameClass()
-    // {
-    //     $adminname = "s";
-    //     return view('admins.admin_create_user', compact('adminname'));
-    // }
 }
