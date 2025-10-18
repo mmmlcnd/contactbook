@@ -24,7 +24,7 @@ class AdminController extends Controller
     {
 
         $title = 'ユーザー管理';
-        $userType = $request->input('type', 'admin'); // デフォルトは生徒
+        $userType = $request->input('type', 'admin');
 
         $classesModel = new Classes();
 
@@ -49,7 +49,7 @@ class AdminController extends Controller
      */
     public function createUser(Request $request)
     {
-        global $pdo; // PDOインスタンスを使用
+        // global $pdo; // PDOインスタンスを使用
 
         // 認証チェック
         if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
@@ -76,11 +76,13 @@ class AdminController extends Controller
         try {
             // 教師・生徒登録の場合、クラスIDの検証とクラス情報（学年・クラス名）の取得を行う
             if ($userType === 'student' || $userType === 'teacher') {
+                // Modelの処理
                 if (empty($classId)) {
                     return $this->redirectBackWithUserType($userType, '学年とクラスの選択は必須です。');
                 }
 
                 // classesテーブルからgradeとnameを取得
+
                 $stmt = $pdo->prepare("SELECT grade, name FROM classes WHERE id = :classId");
                 $stmt->execute(['classId' => $classId]);
                 $classData = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -104,6 +106,7 @@ class AdminController extends Controller
 
                     $studentKana = $kana;
 
+                    // Modelの処理
                     // DBスキーマ (id, name, kana, email, password, grade, class, permission) に合わせる
                     $stmt = $pdo->prepare("INSERT INTO students (email, password, name, kana, grade, class, permission) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
@@ -120,6 +123,7 @@ class AdminController extends Controller
 
                     $teacherKana = $kana;
 
+                    // Modelの処理
                     // DBスキーマ (email, password, name, kana, grade, class) に合わせる
                     $stmt = $pdo->prepare("INSERT INTO teachers (email, password, name, kana, grade, class) VALUES (?, ?, ?, ?, ?, ?)");
                     $stmt->execute([$email, $hashedPassword, $name, $teacherKana, $grade, $className]);
@@ -133,6 +137,7 @@ class AdminController extends Controller
                     $adminName = $name;
                     $adminKana = $kana;
 
+                    // Modelの処理（メインの登録処理）
                     $stmt = $pdo->prepare("INSERT INTO admins (email, password, name, kana) VALUES (?, ?, ?, ?)");
                     $stmt->execute([$email, $hashedPassword, $adminName, $adminKana]);
 

@@ -34,7 +34,16 @@ class Auth extends Model
         } else {
             // ユーザーが見つかったらパスワードの検証
             if (password_verify($password, $user->password)) {
-                return $user;
+                // return $user;
+
+                if (session_status() == PHP_SESSION_NONE) {
+                    session_start();
+                }
+
+                $_SESSION['user_id'] = $user->id;
+                $_SESSION['user_type'] = 'admin';
+
+                return true;
             } else {
                 return false;
             }

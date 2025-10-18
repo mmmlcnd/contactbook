@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Auth;
+use App\Models\AuthModel;
 
 class AuthController extends Controller
 {
@@ -26,7 +27,7 @@ class AuthController extends Controller
     // Admin ログイン処理 (フォーム表示とPOST処理)
     public function adminLogin()
     {
-        global $pdo;
+        // global $pdo;
         $error = null;
 
         // Authモデルのインスタンス化
@@ -40,15 +41,7 @@ class AuthController extends Controller
             // 変数名変える
             $attemptLogin = $authModel->attemptLogin('admins', $email, $password);
 
-            if ($admin = $attemptLogin) {
-
-                if (session_status() == PHP_SESSION_NONE) {
-                    session_start();
-                }
-
-                $_SESSION['user_id'] = $admin->id;
-                $_SESSION['user_type'] = 'admin';
-
+            if ($attemptLogin == true) {
                 // ★ リダイレクト先を /admins/dashboard に戻す
                 return redirect()->route('admins.dashboard');
                 exit;
@@ -65,7 +58,6 @@ class AuthController extends Controller
     // Teacher ログイン処理
     public function teacherLogin()
     {
-        global $pdo;
         $error = null;
 
         // Authモデルのインスタンス化
@@ -78,12 +70,7 @@ class AuthController extends Controller
             $attemptLogin = $authModel->attemptLogin('teachers', $email, $password);
 
 
-            if ($teacher = $attemptLogin) {
-                if (session_status() == PHP_SESSION_NONE) {
-                    session_start();
-                }
-                $_SESSION['user_id'] = $teacher->id;
-                $_SESSION['user_type'] = 'teacher';
+            if ($attemptLogin == true) {
                 // ★ リダイレクト先を /teachers/dashboard に戻す
                 return redirect()->route('teachers.dashboard');
                 exit;
@@ -99,7 +86,6 @@ class AuthController extends Controller
     // Student ログイン処理
     public function studentLogin()
     {
-        global $pdo;
         $error = null;
 
         // Authモデルのインスタンス化
@@ -111,13 +97,7 @@ class AuthController extends Controller
 
             $attemptLogin = $authModel->attemptLogin('students', $email, $password);
 
-
-            if ($student = $attemptLogin) {
-                if (session_status() == PHP_SESSION_NONE) {
-                    session_start();
-                }
-                $_SESSION['user_id'] = $student->id;
-                $_SESSION['user_type'] = 'student';
+            if ($attemptLogin == true) {
                 // ★ リダイレクト先を /students/dashboard に戻す
                 return redirect()->route('students.dashboard');
                 exit;
