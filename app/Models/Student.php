@@ -20,19 +20,6 @@ class Student
         return $stmt->fetch(PDO::FETCH_OBJ);
     }
 
-    public function attemptLogin($email, $password)
-    {
-        $stmt = $this->pdo->prepare("SELECT * FROM students WHERE email = ?");
-        $stmt->execute([$email]);
-        $student = $stmt->fetch(PDO::FETCH_OBJ);
-
-        if ($student && password_verify($password, $student->password)) {
-            return $student;
-        }
-
-        return null;
-    }
-
     public function create($data)
     {
         $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);

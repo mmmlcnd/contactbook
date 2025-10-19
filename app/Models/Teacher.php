@@ -20,19 +20,6 @@ class Teacher
         return $stmt->fetch(PDO::FETCH_OBJ);
     }
 
-    public function attemptLogin($email, $password)
-    {
-        $stmt = $this->pdo->prepare("SELECT * FROM teachers WHERE email = ?");
-        $stmt->execute([$email]);
-        $teacher = $stmt->fetch(PDO::FETCH_OBJ);
-
-        if ($teacher && password_verify($password, $teacher->password)) {
-            return $teacher;
-        }
-
-        return null;
-    }
-
     public function create($data)
     {
         $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
