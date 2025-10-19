@@ -2,9 +2,7 @@
 <div class="dashboard-container">
     <h2>教師ダッシュボード</h2>
 
-    <?php /*
-    <!-- <p>ようこそ、{{ auth()->guard('student')->user()->name}}さん</p> -->*/ ?>
-
+    <p>ようこそ、<?php echo e($_SESSION['user_name']); ?>さん</p>
     <ul>
         <li><a href="<?php echo e(route('teachers.status')); ?>">担当クラスの提出状況確認</a></li>
         <li><a href="<?php echo e(route('teachers.status')); ?>">過去の記録確認</a></li>

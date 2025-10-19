@@ -2,11 +2,7 @@
 <div class="dashboard-container">
     <h2>管理者ダッシュボード</h2>
 
-    <?php //<p>ようこそ、{{ auth()->guard('admin')->user()->name }} さん</p> -->
-    ?>
-
-    <p>ようこそ、さん</p>
-
+    <p>ようこそ、<?php echo e($_SESSION['user_name']); ?>さん</p>
     <ul>
         <li><a href="<?php echo e(route('admins.create')); ?>">生徒・教師アカウント管理</a></li>
 

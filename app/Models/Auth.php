@@ -40,8 +40,15 @@ class Auth extends Model
                     session_start();
                 }
 
-                $_SESSION['user_id'] = $user->id;
-                $_SESSION['user_type'] = 'admin';
+                $_SESSION['user_name'] = $user->name;
+
+                if ($table === 'students') {
+                    $_SESSION['user_type'] = 'student';
+                } else if ($table === 'teachers') {
+                    $_SESSION['user_type'] = 'teacher';
+                } else {
+                    $_SESSION['user_type'] = 'admin';
+                }
 
                 return true;
             } else {

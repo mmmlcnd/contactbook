@@ -16,15 +16,16 @@ Route::get('/', function () {
 // --------------------
 // ログイン画面
 // --------------------
-Route::get('/login/student', [AuthController::class, 'studentLoginForm'])->name('login.student');
-Route::post('/login/student', [AuthController::class, 'studentLogin']);
-
-Route::get('/login/teacher', [AuthController::class, 'teacherLoginForm'])->name('login.teacher');
-Route::post('/login/teacher', [AuthController::class, 'teacherLogin']);
 
 Route::get('/login/admin', [AuthController::class, 'adminLoginForm'])->name('login.admin');
 // URLで/login/adminが指定された場合、POSTされたデータを下記のコントローラーのadminLogin関数に飛ばしている
 Route::post('/login/admin', [AuthController::class, 'adminLogin']);
+
+Route::get('/login/teacher', [AuthController::class, 'teacherLoginForm'])->name('login.teacher');
+Route::post('/login/teacher', [AuthController::class, 'teacherLogin']);
+
+Route::get('/login/student', [AuthController::class, 'studentLoginForm'])->name('login.student');
+Route::post('/login/student', [AuthController::class, 'studentLogin']);
 
 // ログアウト
 Route::post('/logout/{role}', [AuthController::class, 'logout'])->name('logout');
@@ -67,10 +68,6 @@ Route::prefix('teachers')->group(function () {
 Route::prefix('admins')->group(function () {
     // 管理者用ダッシュボード
     Route::get('dashboard', [AdminController::class, 'dashboard'])->name('admins.dashboard');
-    // Route::get('/admins/dashboard', function () {
-    //     return view('admins/admin_dashboard');
-    // });
-
     //管理者ユーザー作成画面
     Route::get('create', [AdminController::class, 'showUserManagement'])->name('admins.create');
     Route::post('create', [AdminController::class, 'createUser']);

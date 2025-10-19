@@ -8,9 +8,9 @@ use App\Models\AuthModel;
 class AuthController extends Controller
 {
     // ログインフォーム表示
-    public function adminLoginForm()
+    public function studentLoginForm()
     {
-        return view('auth.admin_login');
+        return view('auth.student_login');
     }
 
     public function teacherLoginForm()
@@ -18,9 +18,9 @@ class AuthController extends Controller
         return view('auth.teacher_login');
     }
 
-    public function studentLoginForm()
+    public function adminLoginForm()
     {
-        return view('auth.student_login');
+        return view('auth.admin_login');
     }
 
     // ログイン認証

@@ -4,11 +4,7 @@
 <div class="dashboard-container">
     <h2>管理者ダッシュボード</h2>
 
-    <?php //<p>ようこそ、{{ auth()->guard('admin')->user()->name }} さん</p> -->
-    ?>
-
-    <p>ようこそ、さん</p>
-
+    <p>ようこそ、{{$_SESSION['user_name'] }}さん</p>
     <ul>
         <li><a href="{{ route('admins.create') }}">生徒・教師アカウント管理</a></li>
 
