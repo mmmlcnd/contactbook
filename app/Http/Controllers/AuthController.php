@@ -95,9 +95,9 @@ class AuthController extends Controller
             $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
             $password = $_POST['password'] ?? '';
 
-            $attemptLogin = $authModel->attemptLogin('students', $email, $password);
+            $isLoginAttemptSuccessful = $authModel->attemptLogin('students', $email, $password);
 
-            if ($attemptLogin == true) {
+            if ($isLoginAttemptSuccessful == true) {
                 // ★ リダイレクト先を /students/dashboard に戻す
                 return redirect()->route('students.dashboard');
                 exit;
