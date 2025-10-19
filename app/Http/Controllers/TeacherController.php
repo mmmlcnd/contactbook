@@ -41,6 +41,7 @@ class TeacherController extends Controller
         $teacher = $this->getTeacherData($loggedInUserId);
 
         if (!$teacher) {
+            // 書き方直す
             header("Location: /login/teacher");
             exit;
         }
@@ -59,6 +60,7 @@ class TeacherController extends Controller
 
         // 認証チェック
         if (!$teacher) {
+            // 書き方直す
             header("Location: /login/teacher");
             exit;
         }
@@ -146,6 +148,7 @@ class TeacherController extends Controller
         $teacher = $this->getTeacherData($loggedInUserId);
 
         if (!$teacher) {
+            // 書き方直す
             header("Location: /login/teacher");
             exit;
         }
@@ -216,6 +219,7 @@ class TeacherController extends Controller
         $loggedInUserId = $_SESSION['user_id'] ?? null;
 
         if (!$this->getTeacherData($loggedInUserId)) {
+            // 書き方直す
             header("Location: /login/teacher");
             exit;
         }
@@ -225,6 +229,7 @@ class TeacherController extends Controller
         if (!is_numeric($stampId) || $stampId <= 0) {
             // エラー処理（スタンプIDが無効）
             $_SESSION['error_message'] = "無効なスタンプが選択されました。";
+            // 書き方直す
             header("Location: /teachers/read/{$id}");
             exit;
         }
@@ -260,6 +265,7 @@ class TeacherController extends Controller
         }
 
         // 詳細画面に戻る
+        // 書き方直す
         header("Location: /teachers/read/{$id}");
         exit;
     }

@@ -33,6 +33,7 @@ class StudentController extends Controller
     {
         if (!$this->getStudentId()) {
             // 未認証またはロールが異なる場合はログインページへリダイレクト
+            // 書き方直す
             header('Location: /login/students');
             exit;
             return false;
@@ -77,6 +78,7 @@ class StudentController extends Controller
         // バリデーション
         if ($physical === false || $mental === false || $physical < 1 || $physical > 5 || $mental < 1 || $mental > 5 || empty($content)) {
             $_SESSION['error_message'] = '入力内容に誤りがあります。体調評価(1-5)と連絡内容が必須です。';
+            // 書き方直す
             header('Location: /students/entries/create');
             exit;
         }
@@ -89,6 +91,7 @@ class StudentController extends Controller
             $stmtCheck->execute([$studentId, $recordDate]);
             if ($stmtCheck->fetchColumn() > 0) {
                 $_SESSION['error_message'] = '本日は既に連絡帳を提出済みです。';
+                // 書き方直す
                 header('Location: /students/entries/create');
                 exit;
             }
@@ -112,6 +115,7 @@ class StudentController extends Controller
             $_SESSION['error_message'] = 'データの保存中にエラーが発生しました。時間を置いて再度お試しください。';
         }
 
+        // 書き方直す
         header('Location: /students/entries/create');
         exit;
     }
@@ -239,6 +243,8 @@ class StudentController extends Controller
         session_destroy();
 
         // ログイン画面へリダイレクト
+        // 書き方直す
+
         header('Location: /students/login');
         exit;
     }
