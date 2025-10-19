@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EntryController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\LoginController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\AdminController;
@@ -17,18 +17,18 @@ Route::get('/', function () {
 // ログイン画面
 // --------------------
 
-Route::get('/login/admin', [AuthController::class, 'adminLoginForm'])->name('login.admin');
+Route::get('/login/admin', [LoginController::class, 'adminLoginForm'])->name('login.admin');
 // URLで/login/adminが指定された場合、POSTされたデータを下記のコントローラーのadminLogin関数に飛ばしている
-Route::post('/login/admin', [AuthController::class, 'adminLogin']);
+Route::post('/login/admin', [LoginController::class, 'adminLogin']);
 
-Route::get('/login/teacher', [AuthController::class, 'teacherLoginForm'])->name('login.teacher');
-Route::post('/login/teacher', [AuthController::class, 'teacherLogin']);
+Route::get('/login/teacher', [LoginController::class, 'teacherLoginForm'])->name('login.teacher');
+Route::post('/login/teacher', [LoginController::class, 'teacherLogin']);
 
-Route::get('/login/student', [AuthController::class, 'studentLoginForm'])->name('login.student');
-Route::post('/login/student', [AuthController::class, 'studentLogin']);
+Route::get('/login/student', [LoginController::class, 'studentLoginForm'])->name('login.student');
+Route::post('/login/student', [LoginController::class, 'studentLogin']);
 
 // ログアウト
-Route::post('/logout/{role}', [AuthController::class, 'logout'])->name('logout');
+Route::post('/logout/{role}', [LoginController::class, 'logout'])->name('logout');
 
 // --------------------
 // 生徒用画面
