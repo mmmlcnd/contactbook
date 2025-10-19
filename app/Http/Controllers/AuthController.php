@@ -24,10 +24,37 @@ class AuthController extends Controller
         return $this->adminLogin();
     }
 
+    // 作成途中
+    // public function Login()
+    // {
+    //     $error = null;
+
+    //     // Authモデルのインスタンス化
+    //     $authModel = new Auth();
+
+    //     // 変数名必要であれば変更、dashboardのnavへの影響がないか確認
+    //     $userType = '';
+
+    //     if ($_SERVER['REQUEST_METHOD'] === 'POST') { // サーバーへのPOSTリクエストが送られたら
+    //         $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+    //         $password = $_POST['password'] ?? '';
+
+    //         // Postされたデータを取得
+    //         // 変数名変える
+    //         $isLoginAttemptSuccessful = $authModel->attemptLogin('admins', $email, $password);
+
+    //         if ($isLoginAttemptSuccessful == true) {
+    //             // ★ リダイレクト先を /admins/dashboard に戻す
+    //             return redirect()->route('admins.dashboard');
+    //             exit;
+    //         } else {
+    //             $error = 'メールアドレスまたはパスワードが間違っています。';
+    //         }
+    // }
+
     // Admin ログイン処理 (フォーム表示とPOST処理)
     public function adminLogin()
     {
-        // global $pdo;
         $error = null;
 
         // Authモデルのインスタンス化
@@ -39,9 +66,9 @@ class AuthController extends Controller
 
             // Postされたデータを取得
             // 変数名変える
-            $attemptLogin = $authModel->attemptLogin('admins', $email, $password);
+            $isLoginAttemptSuccessful = $authModel->attemptLogin('admins', $email, $password);
 
-            if ($attemptLogin == true) {
+            if ($isLoginAttemptSuccessful == true) {
                 // ★ リダイレクト先を /admins/dashboard に戻す
                 return redirect()->route('admins.dashboard');
                 exit;
@@ -68,9 +95,9 @@ class AuthController extends Controller
             $password = $_POST['password'] ?? '';
 
             // 変数変える
-            $attemptLogin = $authModel->attemptLogin('teachers', $email, $password);
+            $isLoginAttemptSuccessful = $authModel->attemptLogin('teachers', $email, $password);
 
-            if ($attemptLogin == true) {
+            if ($isLoginAttemptSuccessful == true) {
                 // ★ リダイレクト先を /teachers/dashboard に戻す
                 return redirect()->route('teachers.dashboard');
                 exit;
