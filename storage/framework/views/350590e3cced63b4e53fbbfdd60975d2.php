@@ -17,7 +17,7 @@
 
             
             <?php
-            // AuthControllerから渡される変数 $userType を使用
+            // Authから渡される変数 $userType を使用
             $role = $userType ?? ($_SESSION['user_type'] ?? null);
             ?>
 

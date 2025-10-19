@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Auth;
-use App\Models\AuthModel;
+use App\Models\Login;
 
-class AuthController extends Controller
+class LoginController extends Controller
 {
     // ログインフォーム表示
     public function studentLoginForm()
@@ -24,17 +23,17 @@ class AuthController extends Controller
     }
 
     // ログイン認証
-    public function Login($table)
+    public function userLogin($table)
     {
         // Authモデルのインスタンス化
-        $authModel = new Auth();
+        $loginModel = new Login();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // サーバーへのPOSTリクエストが送られたら
             $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
             $password = $_POST['password'] ?? '';
 
             // Postされたデータを取得
-            $isLoginAttemptSuccessful = $authModel->attemptLogin($table, $email, $password);
+            $isLoginAttemptSuccessful = $loginModel->attemptLogin($table, $email, $password);
             if ($isLoginAttemptSuccessful == true) {
                 // ★ リダイレクト先を /{$table}/dashboard に戻す
                 return redirect()->route($table . '.dashboard');
@@ -55,17 +54,17 @@ class AuthController extends Controller
     // 各ユーザー種別でのログイン
     public function studentLogin()
     {
-        return $this->Login('students');
+        return $this->userLogin('students');
     }
 
-    public function teacherLogin()
+    public function teacheruserLogin()
     {
-        return $this->Login('teachers');
+        return $this->userLogin('teachers');
     }
 
-    public function adminLogin()
+    public function adminuserLogin()
     {
-        return $this->Login('admins');
+        return $this->userLogin('admins');
     }
 
     // ログアウト処理
