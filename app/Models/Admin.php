@@ -16,13 +16,6 @@ class Admin extends Model
         'password'
     ];
 
-    protected $pdo;
-
-    public function __construct(PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
-
     // 管理者をIDで取得
     public function find($id) // 指定されたIDに対応するレコードを取得
     {
