@@ -7,16 +7,15 @@ use App\Models\AuthModel;
 
 class AuthController extends Controller
 {
-
     // ログインフォーム表示
     public function adminLoginForm()
     {
-        return view('auth.admins_login');
+        return view('auth.admin_login');
     }
 
     public function teacherLoginForm()
     {
-        return view('auth.teachers_login');
+        return view('auth.teacher_login');
     }
 
     public function studentLoginForm()
