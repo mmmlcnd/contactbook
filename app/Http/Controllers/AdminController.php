@@ -5,12 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Classes;
 use Exception;
-// use App\Models\User;
-// use App\Models\Student;
-// use App\Models\Teacher;
-// use App\Models\Entry;
-// use App\Models\Admin;
-
 
 class AdminController extends Controller
 {
@@ -75,7 +69,6 @@ class AdminController extends Controller
         try {
             // 教師・生徒登録の場合、クラスIDの検証とクラス情報（学年・クラス名）の取得を行う
             if ($userType === 'student' || $userType === 'teacher') {
-                // Modelの処理？？
                 if (empty($classId)) {
                     return $this->redirectBackWithUserType($userType, '学年とクラスの選択は必須です。');
                 }
@@ -117,7 +110,7 @@ class AdminController extends Controller
                 case 'admin':
                     $classesModel->insertAdmin($email, $hashedPassword, $name, $kana);
 
-                    $message = '管理者ユーザー（' . htmlspecialchars($email) . '）が登録されました。';
+                    $message = '管理者ユーザー（' . htmlspecialchars($name) . '）が登録されました。';
                     break;
 
                 default:

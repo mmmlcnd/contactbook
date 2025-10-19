@@ -4,10 +4,7 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// ... データベース接続コードや、その他の require_once が続く ...
-
-// 1. データベース接続を確立し、$pdo 変数をグローバルに定義する
-// index.phpの場所（public）から親ディレクトリ（..）へ移動し、database/db_connect.php を読み込みます。
+// データベース接続を確立し、$pdo 変数をグローバルに定義する
 require_once __DIR__ . '/../database/db_connect.php';
 
 use Illuminate\Foundation\Application;
