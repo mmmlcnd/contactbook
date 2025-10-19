@@ -7,7 +7,24 @@ use App\Models\AuthModel;
 
 class AuthController extends Controller
 {
-    // 作成途中
+
+    // ログインフォーム表示
+    public function adminLoginForm()
+    {
+        return view('auth.admins_login');
+    }
+
+    public function teacherLoginForm()
+    {
+        return view('auth.teachers_login');
+    }
+
+    public function studentLoginForm()
+    {
+        return view('auth.student_login');
+    }
+
+    // ログイン認証
     public function Login($table)
     {
         // Authモデルのインスタンス化
@@ -21,118 +38,36 @@ class AuthController extends Controller
             $isLoginAttemptSuccessful = $authModel->attemptLogin($table, $email, $password);
             if ($isLoginAttemptSuccessful == true) {
                 // ★ リダイレクト先を /{$table}/dashboard に戻す
-                return redirect()->route('{$table}.dashboard');
-                exit;
+                return redirect()->route($table . '.dashboard');
+                // exit;
             } else {
                 $error =  'メールアドレスまたはパスワードが間違っています。';
             }
         }
+        if ($table === 'students') {
+            return view('auth.student_login', compact('error'));
+        } else if ($table === 'teachers') {
+            return view('auth.teacher_login', compact('error'));
+        } else {
+            return view('auth.admin_login', compact('error'));
+        }
     }
 
-    // ログインフォーム表示用のラッパーメソッド
-    public function studentLoginForm()
+    // 各ユーザー種別でのログイン
+    public function studentLogin()
     {
-        return view('auth.student_login');
-        return $this->Login("students");
+        return $this->Login('students');
     }
 
-    public function teacherLoginForm()
+    public function teacherLogin()
     {
-        // return $this->teacherLogin();
+        return $this->Login('teachers');
     }
 
-    public function adminLoginForm()
+    public function adminLogin()
     {
-        // return $this->adminLogin();
+        return $this->Login('admins');
     }
-
-
-
-
-    // // Admin ログイン処理 (フォーム表示とPOST処理)
-    // public function adminLogin()
-    // {
-    //     $error = null;
-
-    //     // Authモデルのインスタンス化
-    //     $authModel = new Auth();
-
-    //     if ($_SERVER['REQUEST_METHOD'] === 'POST') { // サーバーへのPOSTリクエストが送られたら
-    //         $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
-    //         $password = $_POST['password'] ?? '';
-
-    //         // Postされたデータを取得
-    //         // 変数名変える
-    //         $isLoginAttemptSuccessful = $authModel->attemptLogin('admins', $email, $password);
-
-    //         if ($isLoginAttemptSuccessful == true) {
-    //             // ★ リダイレクト先を /admins/dashboard に戻す
-    //             return redirect()->route('admins.dashboard');
-    //             exit;
-    //         } else {
-    //             $error = 'メールアドレスまたはパスワードが間違っています。';
-    //         }
-    //     }
-
-    //     // --- view() 関数を使用 ---
-    //     // $error 変数を compact でビューに渡す
-    //     return view('auth.admin_login', compact('error'));
-    // }
-
-    // // Teacher ログイン処理
-    // public function teacherLogin()
-    // {
-    //     $error = null;
-
-    //     // Authモデルのインスタンス化
-    //     $authModel = new Auth();
-
-    //     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    //         $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
-    //         $password = $_POST['password'] ?? '';
-
-    //         // 変数変える
-    //         $isLoginAttemptSuccessful = $authModel->attemptLogin('teachers', $email, $password);
-
-    //         if ($isLoginAttemptSuccessful == true) {
-    //             // ★ リダイレクト先を /teachers/dashboard に戻す
-    //             return redirect()->route('teachers.dashboard');
-    //             exit;
-    //         } else {
-    //             $error = 'メールアドレスまたはパスワードが間違っています。';
-    //         }
-    //     }
-
-    //     // --- view() 関数を使用 ---
-    //     return view('auth.teacher_login', compact('error'));
-    // }
-
-    // // Student ログイン処理
-    // public function studentLogin()
-    // {
-    //     $error = null;
-
-    //     // Authモデルのインスタンス化
-    //     $authModel = new Auth();
-
-    //     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    //         $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
-    //         $password = $_POST['password'] ?? '';
-
-    //         $isLoginAttemptSuccessful = $authModel->attemptLogin('students', $email, $password);
-
-    //         if ($isLoginAttemptSuccessful == true) {
-    //             // ★ リダイレクト先を /students/dashboard に戻す
-    //             return redirect()->route('students.dashboard');
-    //             exit;
-    //         } else {
-    //             $error = 'メールアドレスまたはパスワードが間違っています。';
-    //         }
-    //     }
-
-    //     // --- view() 関数を使用 ---
-    //     return view('auth.student_login', compact('error'));
-    // }
 
     // ログアウト処理
     // public function logout(): void
