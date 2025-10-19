@@ -17,7 +17,7 @@ Route::get('/', function () {
 // ログイン画面
 // --------------------
 Route::get('/login/student', [AuthController::class, 'studentLoginForm'])->name('login.student');
-Route::post('/login/student', [AuthController::class, 'studentLogin']);
+Route::post('/login/student', [AuthController::class, 'Login("students")']);
 
 Route::get('/login/teacher', [AuthController::class, 'teacherLoginForm'])->name('login.teacher');
 Route::post('/login/teacher', [AuthController::class, 'teacherLogin']);
