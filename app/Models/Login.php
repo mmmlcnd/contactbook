@@ -34,7 +34,6 @@ class Login extends Model
         } else {
             // ユーザーが見つかったらパスワードの検証
             if (password_verify($password, $user->password)) {
-                // return $user;
 
                 if (session_status() == PHP_SESSION_NONE) {
                     session_start();
