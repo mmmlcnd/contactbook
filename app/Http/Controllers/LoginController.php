@@ -57,12 +57,12 @@ class LoginController extends Controller
         return $this->userLogin('students');
     }
 
-    public function teacheruserLogin()
+    public function teacherLogin()
     {
         return $this->userLogin('teachers');
     }
 
-    public function adminuserLogin()
+    public function adminLogin()
     {
         return $this->userLogin('admins');
     }

@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+// use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use PDO;
-// use App\Models\Exception;
 
 class Classes extends Model
 {
-    use HasFactory;
+    // テスト・シーディング用トレイト
+    // use HasFactory;
 
     // 一括代入を許可するカラム
     protected $fillable = [
@@ -29,7 +29,7 @@ class Classes extends Model
         return $this->hasMany(Teacher::class, 'class_id');
     }
 
-    // クラス一覧を取得する
+    // classesテーブルからクラス一覧を取得する
     public function getAllOrderedClasses()
     {
         global $pdo;
