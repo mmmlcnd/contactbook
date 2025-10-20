@@ -33,8 +33,8 @@ class LoginController extends Controller
             $password = $_POST['password'] ?? '';
 
             // Postされたデータを取得
-            $isLoginAttemptSuccessful = $loginModel->attemptLogin($table, $email, $password);
-            if ($isLoginAttemptSuccessful == true) {
+            $isAttemptLogintSuccessful = $loginModel->attemptLogin($table, $email, $password);
+            if ($isAttemptLogintSuccessful == true) {
                 // ★ リダイレクト先を /{$table}/dashboard に戻す
                 return redirect()->route($table . '.dashboard');
                 // exit;
