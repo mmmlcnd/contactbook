@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('stamps', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
             $table->string('name', 50)->comment('スタンプ名 (例: イイネ, 頑張ったね)');
             $table->string('description')->nullable()->comment('スタンプの説明');
             $table->timestamp('created_at')->useCurrent();

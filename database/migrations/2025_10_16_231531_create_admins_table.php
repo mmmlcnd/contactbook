@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('admins', function (Blueprint $table) {
             // id (int(10) UNSIGNED NOT NULL, PRIMARY KEY, AUTO_INCREMENT)
             // MySQLのint(10) UNSIGNED AUTO_INCREMENT PRIMARY KEYに対応
-            $table->increments('id');
+            $table->id();
 
             // name (varchar(100) NOT NULL)
             $table->string('name', 100);

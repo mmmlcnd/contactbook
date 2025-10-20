@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('read_histories', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
             $table->unsignedInteger('entry_id')->comment('対象の連絡帳エントリID');
             $table->unsignedInteger('teacher_id')->index('fk_read_history_teacher')->comment('既読処理を行った担任ID');
             $table->unsignedInteger('stamp_id')->index('fk_read_history_stamp');
