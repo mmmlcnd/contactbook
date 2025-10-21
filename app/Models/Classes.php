@@ -38,12 +38,10 @@ class Classes extends Model
         // $stmt->execute();
         // return $stmt->fetchAll(PDO::FETCH_OBJ);
 
-        $stmt = Classes::select('id', 'name', 'grade')
+        return Classes::select('id', 'name', 'grade')
             ->orderBy('grade', 'asc')
             ->orderBy('id', 'asc')
             ->get(); // 全てのレコードをコレクションとして取得
-
-        return $stmt;
     }
 
     // classesテーブルからgradeとnameを取得
@@ -55,13 +53,12 @@ class Classes extends Model
         // $stmt->execute(['classId' => $classId]);
         // return $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $stmt = Classes::select('grade', 'name')
+        return Classes::select('grade', 'name')
             ->where('id', $classId)
             ->first();
-
-        return $stmt;
     }
 
+    // StudentTeacher.phpに移動
     // 生徒・教師データ挿入
     public function insertStudentOrTeacher($table, $email, $hashedPassword, $name, $kana, $grade, $className, $permission)
     {
@@ -84,20 +81,21 @@ class Classes extends Model
         ]);
     }
 
-    // 管理者データ挿入
-    public function insertAdmin($email, $hashedPassword, $name, $kana)
-    {
-        global $pdo;
+    // 以下Admin.phpに移動
+    // // 管理者データ挿入
+    // public function insertAdmin($email, $hashedPassword, $name, $kana)
+    // {
+    //     global $pdo;
 
-        // DBスキーマ (id, name, kana, email, password) に合わせる
-        // $stmt = $pdo->prepare("INSERT INTO admins (email, password, name, kana) VALUES (?, ?, ?, ?)");
-        // $stmt->execute([$email, $hashedPassword, $name, $kana]);
+    //     // DBスキーマ (id, name, kana, email, password) に合わせる
+    //     // $stmt = $pdo->prepare("INSERT INTO admins (email, password, name, kana) VALUES (?, ?, ?, ?)");
+    //     // $stmt->execute([$email, $hashedPassword, $name, $kana]);
 
-        Admin::insert([
-            'email' => $email,
-            'password' => $hashedPassword,
-            'name' => $name,
-            'kana' => $kana
-        ]);
-    }
+    //     Admin::insert([
+    //         'email' => $email,
+    //         'password' => $hashedPassword,
+    //         'name' => $name,
+    //         'kana' => $kana
+    //     ]);
+    // }
 }
