@@ -20,13 +20,13 @@ class Classes extends Model
     // 学年・クラスに所属する生徒（1対多）
     public function students()
     {
-        return $this->hasMany(Student::class, 'class_id');
+        return $this->hasMany(StudentTeacher::class, 'class_id');
     }
 
     // クラスを担当する先生（1対多想定）
     public function teachers()
     {
-        return $this->hasMany(Teacher::class, 'class_id');
+        return $this->hasMany(StudentTeacher::class, 'class_id');
     }
 
     // classesテーブルからクラス一覧を取得する
