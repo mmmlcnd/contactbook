@@ -4,7 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use PDO;
+use Illuminate\Support\Facades\DB;
 
 class Classes extends Model
 {
@@ -32,21 +32,34 @@ class Classes extends Model
     // classesテーブルからクラス一覧を取得する
     public function getAllOrderedClasses()
     {
-        global $pdo;
+        // global $pdo;
 
-        $stmt = $pdo->prepare("SELECT id, name, grade FROM classes ORDER BY grade ASC, id ASC");
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        // $stmt = $pdo->prepare("SELECT id, name, grade FROM classes ORDER BY grade ASC, id ASC");
+        // $stmt->execute();
+        // return $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        $stmt = Classes::select('id', 'name', 'grade')
+            ->orderBy('grade', 'asc')
+            ->orderBy('id', 'asc')
+            ->get(); // 全てのレコードをコレクションとして取得
+
+        return $stmt;
     }
 
     // classesテーブルからgradeとnameを取得
     public function getGradesAndNames(int $classId)
     {
-        global $pdo;
+        // global $pdo;
 
-        $stmt = $pdo->prepare("SELECT grade, name FROM classes WHERE id = :classId");
-        $stmt->execute(['classId' => $classId]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        // $stmt = $pdo->prepare("SELECT grade, name FROM classes WHERE id = :classId");
+        // $stmt->execute(['classId' => $classId]);
+        // return $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $stmt = Classes::select('grade', 'name')
+            ->where('id', $classId)
+            ->first();
+
+        return $stmt;
     }
 
     // 生徒・教師データ挿入
@@ -55,9 +68,20 @@ class Classes extends Model
         global $pdo;
 
         // DBスキーマ (id, name, kana, email, password, grade, class, permission) に合わせる
-        $stmt = $pdo->prepare("INSERT INTO `{$table}` (email, password, name, kana, grade, class, permission) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        // $stmt = $pdo->prepare("INSERT INTO `{$table}` (email, password, name, kana, grade, class, permission) VALUES (?, ?, ?, ?, ?, ?, ?)");
         // class_idをclassカラムへ、permissionをwriteで設定
-        $stmt->execute([$email, $hashedPassword, $name, $kana, $grade, $className, $permission]);
+        // $stmt->execute([$email, $hashedPassword, $name, $kana, $grade, $className, $permission]);
+
+        // 動的にテーブル名を変更する場合はクエリビルダー（DB）使用
+        DB::table($table)->insert([
+            'email' => $email,
+            'password' => $hashedPassword,
+            'name' => $name,
+            'kana' => $kana,
+            'grade' => $grade,
+            'class' => $className,
+            'permission' => $permission
+        ]);
     }
 
     // 管理者データ挿入
@@ -66,7 +90,14 @@ class Classes extends Model
         global $pdo;
 
         // DBスキーマ (id, name, kana, email, password) に合わせる
-        $stmt = $pdo->prepare("INSERT INTO admins (email, password, name, kana) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$email, $hashedPassword, $name, $kana]);
+        // $stmt = $pdo->prepare("INSERT INTO admins (email, password, name, kana) VALUES (?, ?, ?, ?)");
+        // $stmt->execute([$email, $hashedPassword, $name, $kana]);
+
+        Admin::insert([
+            'email' => $email,
+            'password' => $hashedPassword,
+            'name' => $name,
+            'kana' => $kana
+        ]);
     }
 }
