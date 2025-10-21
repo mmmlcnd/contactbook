@@ -14,22 +14,22 @@ class Login extends Model
 
     public function attemptLogin(string $table, ?string $email, ?string $password)
     {
-        // PDOインスタンス（メソッドごとに必要？）
-        $pdo = DB::connection()->getPdo();
-
-        // 必要？
-        if (!$pdo) {
-            return null;
-        }
 
         if (empty($email) || empty($password)) {
             return null;
         }
 
         // メールアドレスでユーザーレコードを取得
-        $stmt = $pdo->prepare("SELECT * FROM `{$table}` WHERE email = :email");
-        $stmt->execute([':email' => $email]);
-        $user = $stmt->fetch(\PDO::FETCH_OBJ);
+
+        // PHPでの書き方
+        // $stmt = $pdo->prepare("SELECT * FROM `{$table}` WHERE email = :email");
+        // $stmt->execute([':email' => $email]);
+        // $user = $stmt->fetch(\PDO::FETCH_OBJ);
+
+        // 動的にテーブル名を変更する場合はクエリビルダー（DB）使用
+        $user = DB::table($table)
+            ->where('email', $email) //WHERE email = :emailに相当
+            ->first(); //PDO::FETCH_OBJに相当
 
         // ユーザーが見つからない場合は失敗
         if (!$user) {
