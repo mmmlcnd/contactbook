@@ -14,7 +14,7 @@ class AdminController extends Controller
         return view('admins.admin_dashboard');
     }
 
-    public function create(Request $request)
+    public function showUserManagement(Request $request)
     {
 
         $title = 'ユーザー管理';
@@ -38,9 +38,9 @@ class AdminController extends Controller
      * 新しいユーザーをデータベースに登録する。
      *
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return string
      */
-    public function store(Request $request)
+    public function createUser(Request $request)
     {
         // 認証チェック
         if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
@@ -126,7 +126,7 @@ class AdminController extends Controller
 
         // 成功メッセージをセッションにFlashし、リダイレクト
         $_SESSION['success'] = $message;
-        return redirect()->to(url('/admins/users/create', ['type' => $userType]));
+        return redirect()->to('/admins/create');
     }
 
     /**
@@ -138,7 +138,7 @@ class AdminController extends Controller
         $_SESSION['user_type_temp'] = $userType;
 
         // フレームワークのリダイレクト機能を使用してエラーメッセージをフラッシュ
-        return redirect()->to(url('/admins/users/create', ['type' => $userType]))->with('error', $errorMessage);
+        return redirect()->to('/admins/create')->with('error', $errorMessage);
     }
 
     // クラス管理画面表示

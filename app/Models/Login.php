@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Login extends Model
 {
@@ -13,8 +14,10 @@ class Login extends Model
 
     public function attemptLogin(string $table, ?string $email, ?string $password)
     {
-        global $pdo;
+        // PDOインスタンス（メソッドごとに必要？）
+        $pdo = DB::connection()->getPdo();
 
+        // 必要？
         if (!$pdo) {
             return null;
         }

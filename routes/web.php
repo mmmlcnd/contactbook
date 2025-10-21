@@ -1,12 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\EntryController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\AdminUserController;
+// use App\Http\Controllers\AdminUserController;
+// use App\Http\Controllers\EntryController;
 
 //デフォルト画面
 Route::get('/', function () {
@@ -65,12 +65,28 @@ Route::prefix('teachers')->group(function () {
 // --------------------
 // 管理者用画面
 // --------------------
+
+// Route::resource 以下2つのルート生成
+// 1. GET /admins/users/create -> AdminController@create (フォーム表示)
+// 2. POST /admins/users       -> AdminController@store (登録処理)
+
+//管理者ユーザー作成画面
+// Route::resource('users', AdminController::class)->only([
+//     'create',
+//     'store'
+// ])->names([
+//     'create' => 'admins.create', // showUserManagementに対応
+//     'store'  => 'admins.store',  // create (ユーザー登録)に対応
+// ]);
+
+Route::get('admins/users/create', [AdminController::class, 'create'])->name('admins.create');
+Route::post('admins/users/create', [AdminController::class, 'store']);
+
 Route::prefix('admins')->group(function () {
     // 管理者用ダッシュボード
     Route::get('dashboard', [AdminController::class, 'dashboard'])->name('admins.dashboard');
-    //管理者ユーザー作成画面
-    Route::get('create', [AdminController::class, 'showUserManagement'])->name('admins.create');
-    Route::post('create', [AdminController::class, 'createUser']);
+
+
     // 管理者クラス管理画面
-    Route::get('classes', [AdminController::class, 'manageClasses'])->name('classes');
+    // Route::get('classes', [AdminController::class, 'manageClasses'])->name('classes');
 });
