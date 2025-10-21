@@ -27,16 +27,6 @@ class Admin extends Model
             ->first();
     }
 
-    // 新規作成
-    // public function create($data) // 新しいレコードをデータベースに作成
-    // {
-    //     $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-    //     $stmt = $this->pdo->prepare("INSERT INTO admins (name, kana, email, password, created_at, updated_at)
-    //         VALUES (?, ?, ?, ?, NOW(), NOW())");
-    //     $stmt->execute([$data['name'], $data['kana'], $data['email'], $data['password']]);
-    //     return $this->pdo->lastInsertId();
-    // }
-
     // 管理者データ挿入
     public function insertAdmin($email, $hashedPassword, $name, $kana)
     {
@@ -55,4 +45,14 @@ class Admin extends Model
         // -> created_at, updated_at が自動で入る
         // -> 作成された Admin Model インスタンスが返される
     }
+
+    // 新規作成
+    // public function create($data) // 新しいレコードをデータベースに作成
+    // {
+    //     $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+    //     $stmt = $this->pdo->prepare("INSERT INTO admins (name, kana, email, password, created_at, updated_at)
+    //         VALUES (?, ?, ?, ?, NOW(), NOW())");
+    //     $stmt->execute([$data['name'], $data['kana'], $data['email'], $data['password']]);
+    //     return $this->pdo->lastInsertId();
+    // }
 }

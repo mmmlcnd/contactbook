@@ -13,17 +13,15 @@ class StudentTeacher extends Model
         // $stmt->execute([$id]);
         // return $stmt->fetch(PDO::FETCH_OBJ);
 
-        $result = DB::table($table)
+        return DB::table($table)
             ->where('id', $id) // IDで検索
             ->first();         // 最初の1件を取得
-
-        return $result;
     }
 
     public function insertStudentOrTeacher($table, $email, $hashedPassword, $name, $kana, $grade, $className, $permission)
     {
         // 動的にテーブル名を変更する場合はクエリビルダー（DB）使用
-        return DB::table($table)->create([
+        DB::table($table)->create([
             'email' => $email,
             'password' => $hashedPassword,
             'name' => $name,
