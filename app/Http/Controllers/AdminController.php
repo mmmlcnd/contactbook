@@ -126,7 +126,9 @@ class AdminController extends Controller
 
         // 成功メッセージをセッションにFlashし、リダイレクト
         $_SESSION['success'] = $message;
-        return redirect()->to(url('/admins/users/create', ['type' => $userType]));
+        // return redirect()->to('/create', ['type' => $userType]);
+        // return redirect()->route('admins.users.create', ['type' => $userType]);
+        return redirect()->route('admins.dashboard');
     }
 
     /**
@@ -138,7 +140,7 @@ class AdminController extends Controller
         $_SESSION['user_type_temp'] = $userType;
 
         // フレームワークのリダイレクト機能を使用してエラーメッセージをフラッシュ
-        return redirect()->to(url('/admins/users/create', ['type' => $userType]))->with('error', $errorMessage);
+        return redirect()->to('/admins/users/create', ['type' => $userType])->with('error', $errorMessage);
     }
 
     // クラス管理画面表示

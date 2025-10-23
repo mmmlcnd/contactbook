@@ -65,7 +65,6 @@ class StudentController extends Controller
     {
         if (!$this->checkAuth()) return;
 
-        // F-4.1: 連絡帳提出フォームを表示
         return view('students.student_create_entry', ['title' => '連絡帳提出']);
     }
 
@@ -92,6 +91,7 @@ class StudentController extends Controller
         }
 
         try {
+            // 静的メソッドの呼び出し
             $count = Entry::countEntriesForStudentAndDate($studentId, $recordDate);
 
             if ($count > 0) {

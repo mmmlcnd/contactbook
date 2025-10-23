@@ -79,13 +79,13 @@ Route::prefix('teachers')->group(function () {
 //     'store'  => 'admins.store',  // create (ユーザー登録)に対応
 // ]);
 
-Route::get('admins/users/create', [AdminController::class, 'create'])->name('admins.create');
-Route::post('admins/users/create', [AdminController::class, 'store']);
-
 Route::prefix('admins')->group(function () {
     // 管理者用ダッシュボード
     Route::get('dashboard', [AdminController::class, 'dashboard'])->name('admins.dashboard');
 
+    //管理者ユーザー作成画面
+    Route::get('users/create', [AdminController::class, 'create'])->name('admins.create');
+    Route::post('users/create', [AdminController::class, 'store']);
 
     // 管理者クラス管理画面
     // Route::get('classes', [AdminController::class, 'manageClasses'])->name('classes');
