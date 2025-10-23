@@ -53,6 +53,7 @@ $reportDateText = $reportDate->format('Y年m月d日');
         {{-- 連絡帳提出フォーム --}}
         <form action="/students/entries/create" method="POST" class="space-y-8">
             <input type="hidden" name="_method" value="POST">
+            @csrf
 
             <!-- 身体的コンディション -->
             <div class="form-group p-4 border border-gray-200 rounded-lg">

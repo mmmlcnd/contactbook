@@ -54,6 +54,7 @@ $reportDateText = $reportDate->format('Y年m月d日');
         
         <form action="/students/entries/create" method="POST" class="space-y-8">
             <input type="hidden" name="_method" value="POST">
+            <?php echo csrf_field(); ?>
 
             <!-- 身体的コンディション -->
             <div class="form-group p-4 border border-gray-200 rounded-lg">

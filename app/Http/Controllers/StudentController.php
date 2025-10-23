@@ -3,15 +3,25 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Student;
+use App\Models\StudentTeacher;
 use App\Models\Entry;
-use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use PDO;
 
 
 class StudentController extends Controller
 {
+    /**
+     * コンストラクタ: セッションを開始し、$_SESSIONを使用できるようにする
+     */
+    public function __construct()
+    {
+        // PHPのセッションがまだ開始されていない場合にのみ開始する
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+    }
+
     /**
      * 現在認証されている生徒のIDを取得する
      * @return int|null 生徒ID
@@ -33,8 +43,7 @@ class StudentController extends Controller
     {
         if (!$this->getStudentId()) {
             // 未認証またはロールが異なる場合はログインページへリダイレクト
-            // 書き方直す
-            header('Location: /login/students');
+            redirect()->route('login.student');
             exit;
             return false;
         }
@@ -78,174 +87,119 @@ class StudentController extends Controller
         // バリデーション
         if ($physical === false || $mental === false || $physical < 1 || $physical > 5 || $mental < 1 || $mental > 5 || empty($content)) {
             $_SESSION['error_message'] = '入力内容に誤りがあります。体調評価(1-5)と連絡内容が必須です。';
-            // 書き方直す
-            header('Location: /students/entries/create');
-            exit;
+
+            return redirect()->route('students.entries.create');
         }
 
         try {
-            $pdo = $this->getPdo();
+            $count = Entry::countEntriesForStudentAndDate($studentId, $recordDate);
 
-            // 既に本日の提出があるかチェック
-            $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM entries WHERE student_id = ? AND record_date = ?");
-            $stmtCheck->execute([$studentId, $recordDate]);
-            if ($stmtCheck->fetchColumn() > 0) {
+            if ($count > 0) {
                 $_SESSION['error_message'] = '本日は既に連絡帳を提出済みです。';
-                // 書き方直す
-                header('Location: /students/entries/create');
-                exit;
+
+                return redirect()->route('students.entries.create');
             }
 
-            // 提出 (Entry) をデータベースに挿入
-            $sql = "INSERT INTO entries (student_id, record_date, condition_physical, condition_mental, content, is_read)
-                    VALUES (?, ?, ?, ?, ?, 0)";
-            $stmt = $pdo->prepare($sql);
-
-            $stmt->execute([
-                $studentId,
-                $recordDate,
-                $physical,
-                $mental,
-                $content
-            ]);
+            Entry::insertEntry($studentId, $recordDate, $physical, $mental, $content);
 
             $_SESSION['success_message'] = '連絡帳が正常に提出されました。先生の確認をお待ちください。';
+            return redirect()->route('students.entries.create');
         } catch (\PDOException $e) {
+
             error_log("Database error in createEntry: " . $e->getMessage());
             $_SESSION['error_message'] = 'データの保存中にエラーが発生しました。時間を置いて再度お試しください。';
         }
 
-        // 書き方直す
-        header('Location: /students/entries/create');
-        exit;
+        return redirect()->route('students.entries.create');
     }
-
-    // 入力内容を保存
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'entry_date' => 'required|date',
-    //         'content' => 'required|string',
-    //     ]);
-
-    //     $student = Student::where('user_id', Auth::id())->first();
-
-    //     if (!$student) {
-    //         return "生徒データが見つかりません。";
-    //     }
-
-    //     Entry::create([
-    //         'student_id' => $student->id,
-    //         'entry_date' => $request->entry_date,
-    //         'content' => $request->content,
-    //         'is_read' => false,
-    //     ]);
-
-    //     return redirect()->route('students.entries.past')->with('success', '提出しました');
-    // }
-
 
     /**
      * 過去提出履歴を表示 (F-4.2)
      */
-    public function showPastEntries()
-    {
-        if (!$this->checkAuth()) return;
-
-        $studentId = $this->getStudentId();
-        $pastEntries = [];
-
-        try {
-            $pdo = $this->getPdo();
-
-            // 自身の全提出履歴を、最新の日付順に取得する
-            $sql = "
-                SELECT
-                    e.*,
-                    rh.stamped_at,
-                    t.name AS teacher_name,
-                    s.name AS stamp_name
-                FROM entries e
-                LEFT JOIN read_histories rh ON e.id = rh.entry_id
-                LEFT JOIN teachers t ON rh.teacher_id = t.id
-                LEFT JOIN stamps s ON rh.stamp_id = s.id
-                WHERE e.student_id = ?
-                ORDER BY e.record_date DESC, e.id DESC
-            ";
-
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([$studentId]);
-            $results = $stmt->fetchAll(PDO::FETCH_OBJ);
-
-            // 日付ごとにエントリと履歴をグループ化
-            $groupedEntries = [];
-            foreach ($results as $row) {
-                $date = $row->record_date;
-                if (!isset($groupedEntries[$date])) {
-                    $groupedEntries[$date] = (object)[
-                        'entry' => (object)[
-                            'id' => $row->id,
-                            'record_date' => $row->record_date,
-                            'content' => $row->content,
-                            'condition_physical' => $row->condition_physical,
-                            'condition_mental' => $row->condition_mental,
-                            'is_read' => $row->is_read,
-                        ],
-                        'read_history' => []
-                    ];
-                }
-
-                // read_historyがある場合のみ追加
-                if ($row->stamped_at) {
-                    $groupedEntries[$date]->read_history[] = (object)[
-                        'teacher_name' => $row->teacher_name,
-                        'stamp_name' => $row->stamp_name,
-                        'stamped_at' => $row->stamped_at,
-                    ];
-                }
-            }
-
-            // 連想配列を数値インデックスの配列に戻す
-            $pastEntries = array_values($groupedEntries);
-        } catch (\PDOException $e) {
-            error_log("Database error in showPastEntries: " . $e->getMessage());
-            $_SESSION['error_message'] = '提出履歴の取得中にエラーが発生しました。';
-        }
-
-        // F-4.2: 過去提出履歴を表示
-        return view('students/student_past_entries', [
-            'title' => '提出履歴',
-            'pastEntries' => $pastEntries,
-        ]);
-    }
-    // 過去記録閲覧
-    // public function past()
+    // public function showPastEntries()
     // {
-    //     $student = Student::where('user_id', Auth::id())->first();
+    //     if (!$this->checkAuth()) return;
 
-    //     if (!$student) {
-    //         return "生徒データが見つかりません。";
+    //     $studentId = $this->getStudentId();
+    //     $pastEntries = [];
+
+    //     try {
+    //         $pdo = $this->getPdo();
+
+    //         // 自身の全提出履歴を、最新の日付順に取得する
+    //         $sql = "
+    //             SELECT
+    //                 e.*,
+    //                 rh.stamped_at,
+    //                 t.name AS teacher_name,
+    //                 s.name AS stamp_name
+    //             FROM entries e
+    //             LEFT JOIN read_histories rh ON e.id = rh.entry_id
+    //             LEFT JOIN teachers t ON rh.teacher_id = t.id
+    //             LEFT JOIN stamps s ON rh.stamp_id = s.id
+    //             WHERE e.student_id = ?
+    //             ORDER BY e.record_date DESC, e.id DESC
+    //         ";
+
+    //         $stmt = $pdo->prepare($sql);
+    //         $stmt->execute([$studentId]);
+    //         $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+    //         // 日付ごとにエントリと履歴をグループ化
+    //         $groupedEntries = [];
+    //         foreach ($results as $row) {
+    //             $date = $row->record_date;
+    //             if (!isset($groupedEntries[$date])) {
+    //                 $groupedEntries[$date] = (object)[
+    //                     'entry' => (object)[
+    //                         'id' => $row->id,
+    //                         'record_date' => $row->record_date,
+    //                         'content' => $row->content,
+    //                         'condition_physical' => $row->condition_physical,
+    //                         'condition_mental' => $row->condition_mental,
+    //                         'is_read' => $row->is_read,
+    //                     ],
+    //                     'read_history' => []
+    //                 ];
+    //             }
+
+    //             // read_historyがある場合のみ追加
+    //             if ($row->stamped_at) {
+    //                 $groupedEntries[$date]->read_history[] = (object)[
+    //                     'teacher_name' => $row->teacher_name,
+    //                     'stamp_name' => $row->stamp_name,
+    //                     'stamped_at' => $row->stamped_at,
+    //                 ];
+    //             }
+    //         }
+
+    //         // 連想配列を数値インデックスの配列に戻す
+    //         $pastEntries = array_values($groupedEntries);
+    //     } catch (\PDOException $e) {
+    //         error_log("Database error in showPastEntries: " . $e->getMessage());
+    //         $_SESSION['error_message'] = '提出履歴の取得中にエラーが発生しました。';
     //     }
 
-    //     $entries = $student->entries()->orderBy('entry_date', 'desc')->get();
-
-    //     return view('students.past_entries', compact('entries'));
+    //     // F-4.2: 過去提出履歴を表示
+    //     return view('students/student_past_entries', [
+    //         'title' => '提出履歴',
+    //         'pastEntries' => $pastEntries,
+    //     ]);
     // }
 
     /**
      * ログアウト処理 (F-1.5)
      */
-    public function logout()
-    {
-        // ログアウト処理（セッション破棄）
-        session_start();
-        session_unset();
-        session_destroy();
+    // public function logout()
+    // {
+    //     // ログアウト処理（セッション破棄）
+    //     session_start();
+    //     session_unset();
+    //     session_destroy();
 
-        // ログイン画面へリダイレクト
-        // 書き方直す
+    //     // ログイン画面へリダイレクト
+    //     redirect()->route('login.student');
 
-        header('Location: /students/login');
-        exit;
-    }
+    //     exit;
+    // }
 }

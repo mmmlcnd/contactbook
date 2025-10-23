@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Entry;
-use App\Models\Student; // 生徒用モデル
-
-// use Illuminate\Support\Facades\Auth; // ログインユーザー取得用
+use App\Models\StudentTeacher;
 
 class EntryController extends Controller
 {
@@ -46,7 +44,7 @@ class EntryController extends Controller
     {
         // 担当クラスの生徒とその提出状況を取得
         // PoCなので全生徒を取得
-        $students = Student::with('user', 'class', 'entries')->get();
+        $students = StudentTeacher::with('user', 'class', 'entries')->get();
 
         return view('entries.status', compact('students'));
     }
