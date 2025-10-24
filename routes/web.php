@@ -84,6 +84,13 @@ Route::prefix('admins')->group(function () {
     Route::get('dashboard', [AdminController::class, 'dashboard'])->name('admins.dashboard');
 
     //管理者ユーザー作成画面
+    // Route::resource('users', AdminController::class)->only([
+    //     'create',
+    //     'store'
+    // ])->names([
+    //     'create' => 'admins.create'
+    // ]);
+
     Route::get('users/create', [AdminController::class, 'create'])->name('admins.create');
     Route::post('users/create', [AdminController::class, 'store']);
 

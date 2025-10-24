@@ -130,9 +130,7 @@ class AdminController extends Controller
 
         // 成功メッセージをセッションにFlashし、リダイレクト
         $_SESSION['success'] = $message;
-        // return redirect()->to('/create', ['type' => $userType]);
-        // return redirect()->route('admins.create', ['type' => $userType]);
-        return redirect()->route('admins.create', ['type' => $userType])->with('success', $message);
+        return redirect()->route('admins.create')->with('success', $message);
     }
 
     /**
