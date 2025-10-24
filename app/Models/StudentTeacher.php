@@ -5,30 +5,40 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
+// DynamicTableManagerのような名前に変更を推奨します
 class StudentTeacher extends Model
 {
-    public function find($table, $id)
-    {
-        // $stmt = $this->pdo->prepare("SELECT * FROM students WHERE id = ?");
-        // $stmt->execute([$id]);
-        // return $stmt->fetch(PDO::FETCH_OBJ);
+    // Eloquentの自動タイムスタンプ機能を無効にする（このModelではクエリビルダを使うため）
+    public $timestamps = false;
 
+    /**
+     * 動的なテーブルからIDでレコードを検索する。
+     * @return object|null
+     */
+    public function findByTableAndId(string $table, int $id)
+    {
         return DB::table($table)
-            ->where('id', $id) // IDで検索
-            ->first();         // 最初の1件を取得
+            ->where('id', $id)
+            ->first();
     }
 
-    public function insertStudentOrTeacher($table, $email, $hashedPassword, $name, $kana, $grade, $className, $permission)
+    /**
+     * 動的なテーブルに生徒または教師を挿入する（クエリビルダを使用）
+     * @return bool
+     */
+    public function insertStudentOrTeacher(string $table, string $email, string $hashedPassword, string $name, string $kana, string $grade, string $className, string $permission): bool
     {
-        // 動的にテーブル名を変更する場合はクエリビルダー（DB）使用
-        DB::table($table)->create([
+        // クエリビルダのためinsert() メソッドを使用
+        return DB::table($table)->insert([
             'email' => $email,
             'password' => $hashedPassword,
             'name' => $name,
             'kana' => $kana,
             'grade' => $grade,
             'class' => $className,
-            'permission' => $permission
+            'permission' => $permission,
+            'created_at' => now(), // 必須: タイムスタンプを手動で設定
+            'updated_at' => now(), // 必須: タイムスタンプを手動で設定
         ]);
     }
 }

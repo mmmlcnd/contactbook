@@ -31,7 +31,7 @@ $selectedUserType = 'student';
     <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
         <h2 class="text-2xl font-semibold mb-4 border-b pb-2 text-gray-700">新規ユーザー作成</h2>
 
-        <form method="POST" action="admins/users/create" class="space-y-6">
+        <form method="POST" action="<?php echo e(route('admins.create')); ?>" class="space-y-6">
             <?php echo csrf_field(); ?>
 
             
@@ -153,4 +153,5 @@ $selectedUserType = 'student';
     }
 </script>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layouts.dashboard', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\contactbook\resources\views/admins/admin_create_user.blade.php ENDPATH**/ ?>

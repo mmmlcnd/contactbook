@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Classes;
+use App\Models\StudentTeacher;
+use App\Models\Admin;
 use Exception;
 
 class AdminController extends Controller
@@ -16,7 +18,6 @@ class AdminController extends Controller
 
     public function create(Request $request)
     {
-
         $title = 'ユーザー管理';
         $userType = $request->input('type', 'admin');
 
@@ -27,7 +28,8 @@ class AdminController extends Controller
         } catch (Exception $e) {
             error_log("Failed to fetch classes: " . $e->getMessage());
             $classes = []; // 失敗した場合は空の配列を渡す
-            $_SESSION['error'] = 'クラス一覧の取得に失敗しました。';
+            // $_SESSION['error'] = 'クラス一覧の取得に失敗しました。';
+            session()->flash('error', 'クラス一覧の取得に失敗しました。');
         }
 
         // 取得したクラスデータをビューに渡す
@@ -65,6 +67,8 @@ class AdminController extends Controller
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         $classesModel = new Classes();
+        $studentTeacherModel = new StudentTeacher();
+        $adminModel = new Admin();
 
         try {
             // 教師・生徒登録の場合、クラスIDの検証とクラス情報（学年・クラス名）の取得を行う
@@ -91,7 +95,7 @@ class AdminController extends Controller
                         return $this->redirectBackWithUserType($userType, '生徒の学年 (Grade)、クラスIDは必須です。');
                     }
 
-                    $classesModel->insertStudentOrTeacher('students', $email, $hashedPassword, $name, $kana, $grade, $className, 'write');
+                    $studentTeacherModel->insertStudentOrTeacher('students', $email, $hashedPassword, $name, $kana, $grade, $className, 'write');
 
                     $message = '生徒ユーザー（' . htmlspecialchars($name) . '）が登録されました。';
                     break;
@@ -102,13 +106,13 @@ class AdminController extends Controller
                         return $this->redirectBackWithUserType($userType, '教師の学年 (Grade)、クラスIDは必須です。');
                     }
 
-                    $classesModel->insertStudentOrTeacher('teachers', $email, $hashedPassword, $name, $kana, $grade, $className, 'read');
+                    $studentTeacherModel->insertStudentOrTeacher('teachers', $email, $hashedPassword, $name, $kana, $grade, $className, 'read');
 
                     $message = '教師ユーザー（' . htmlspecialchars($name) . '）が登録されました。';
                     break;
 
                 case 'admin':
-                    $classesModel->insertAdmin($email, $hashedPassword, $name, $kana);
+                    $adminModel->insertAdmin($email, $hashedPassword, $name, $kana);
 
                     $message = '管理者ユーザー（' . htmlspecialchars($name) . '）が登録されました。';
                     break;
@@ -127,8 +131,8 @@ class AdminController extends Controller
         // 成功メッセージをセッションにFlashし、リダイレクト
         $_SESSION['success'] = $message;
         // return redirect()->to('/create', ['type' => $userType]);
-        // return redirect()->route('admins.users.create', ['type' => $userType]);
-        return redirect()->route('admins.dashboard');
+        // return redirect()->route('admins.create', ['type' => $userType]);
+        return redirect()->route('admins.create', ['type' => $userType])->with('success', $message);
     }
 
     /**
@@ -140,12 +144,12 @@ class AdminController extends Controller
         $_SESSION['user_type_temp'] = $userType;
 
         // フレームワークのリダイレクト機能を使用してエラーメッセージをフラッシュ
-        return redirect()->to('/admins/users/create', ['type' => $userType])->with('error', $errorMessage);
+        // return redirect()->to('/admins/users/create', ['type' => $userType])->with('error', $errorMessage);
     }
 
     // クラス管理画面表示
-    public function manageClasses()
-    {
-        return view('admins.admin_manage_classes');
-    }
+    // public function manageClasses()
+    // {
+    //     return view('admins.admin_manage_classes');
+    // }
 }
