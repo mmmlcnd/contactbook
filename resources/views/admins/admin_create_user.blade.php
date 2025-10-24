@@ -31,7 +31,7 @@ $selectedUserType = 'student';
     <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
         <h2 class="text-2xl font-semibold mb-4 border-b pb-2 text-gray-700">新規ユーザー作成</h2>
 
-        <form method="POST" action="{{ route('admins.create') }}" class="space-y-6">
+        <form method="POST" action="{{ route('admins.store') }}" class="space-y-6">
             @csrf
 
             {{-- ユーザータイプ選択 --}}

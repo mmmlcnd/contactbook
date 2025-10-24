@@ -142,7 +142,7 @@ class AdminController extends Controller
         $_SESSION['user_type_temp'] = $userType;
 
         // フレームワークのリダイレクト機能を使用してエラーメッセージをフラッシュ
-        // return redirect()->to('/admins/users/create', ['type' => $userType])->with('error', $errorMessage);
+        return redirect()->route('admins.create')->with('error', $errorMessage);
     }
 
     // クラス管理画面表示
