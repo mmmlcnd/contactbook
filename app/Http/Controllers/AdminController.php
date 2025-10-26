@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Classes;
-use App\Models\StudentTeacher;
+use App\Models\Student;
+use App\Models\Teacher;
 use App\Models\Admin;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -68,7 +69,7 @@ class AdminController extends Controller
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         $classesModel = new Classes();
-        $studentTeacherModel = new StudentTeacher();
+        // $studentTeacherModel = new StudentTeacher();
         $adminModel = new Admin();
 
         try {
@@ -96,7 +97,15 @@ class AdminController extends Controller
                         return $this->redirectBackWithUserType($userType, '生徒の学年 (Grade)、クラスIDは必須です。');
                     }
 
-                    $studentTeacherModel->insertStudentOrTeacher('students', $email, $hashedPassword, $name, $kana, $grade, $className, 'write');
+                    Student::create([
+                        'email' => $email,
+                        'password' => $hashedPassword,
+                        'name' => $name,
+                        'kana' => $kana,
+                        'grade' => $grade,
+                        'class_name' => $className,
+                        'permission' => 'write',
+                    ]);
 
                     $message = '生徒ユーザー（' . htmlspecialchars($name) . '）が登録されました。';
                     break;
@@ -107,7 +116,15 @@ class AdminController extends Controller
                         return $this->redirectBackWithUserType($userType, '教師の学年 (Grade)、クラスIDは必須です。');
                     }
 
-                    $studentTeacherModel->insertStudentOrTeacher('teachers', $email, $hashedPassword, $name, $kana, $grade, $className, 'read');
+                    Teacher::create([
+                        'email' => $email,
+                        'password' => $hashedPassword,
+                        'name' => $name,
+                        'kana' => $kana,
+                        'grade' => $grade,
+                        'class_name' => $className,
+                        'permission' => 'read',
+                    ]);
 
                     $message = '教師ユーザー（' . htmlspecialchars($name) . '）が登録されました。';
                     break;
