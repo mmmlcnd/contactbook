@@ -69,21 +69,13 @@ class AdminController extends Controller
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         $classesModel = new Classes();
-        // $studentTeacherModel = new StudentTeacher();
         $adminModel = new Admin();
 
         try {
             // 教師・生徒登録の場合、クラスIDの検証とクラス情報（学年・クラス名）の取得を行う
             if ($userType === 'student' || $userType === 'teacher') {
-                if (empty($classId)) {
-                    return $this->redirectBackWithUserType($userType, '学年とクラスの選択は必須です。');
-                }
 
                 $classData = $classesModel->getGradesAndNames($classId);
-
-                if (!$classData) {
-                    return $this->redirectBackWithUserType($userType, '指定されたクラスIDは無効です。');
-                }
 
                 // 取得した学年とクラス名を変数に格納
                 $grade = $classData['grade'];
@@ -92,10 +84,6 @@ class AdminController extends Controller
             }
             switch ($userType) {
                 case 'student':
-                    // バリデーション: 学年 (Grade)、クラスIDは必須
-                    if (empty($grade) || empty($classId)) {
-                        return $this->redirectBackWithUserType($userType, '生徒の学年 (Grade)、クラスIDは必須です。');
-                    }
 
                     Student::create([
                         'email' => $email,
@@ -111,10 +99,6 @@ class AdminController extends Controller
                     break;
 
                 case 'teacher':
-                    // バリデーション: 学年 (Grade)、クラスIDは必須
-                    if (empty($grade) || empty($classId)) {
-                        return $this->redirectBackWithUserType($userType, '教師の学年 (Grade)、クラスIDは必須です。');
-                    }
 
                     Teacher::create([
                         'email' => $email,
@@ -140,15 +124,6 @@ class AdminController extends Controller
             }
         } catch (Exception $e) {
 
-            // 🚨 ここでLaravelのログに記録
-            Log::error("Registration failed: " . $e->getMessage());
-
-            // エラーロギングとユーザーフレンドリーなメッセージ
-            error_log("Database Error in createUser: " . $e->getMessage());
-
-            // 💡 画面に詳細なエラーメッセージを出す 💡
-            $detailedError = 'ユーザー登録中にエラーが発生しました。詳細: ' . $e->getMessage();
-
             // エラーメッセージを表示
             return $this->redirectBackWithUserType($userType, 'ユーザー登録中にデータベースエラーが発生しました。エラーコード: ' . $e->getCode() . ' 詳細: ' . $e->getMessage());
         }
@@ -167,6 +142,7 @@ class AdminController extends Controller
         $_SESSION['user_type_temp'] = $userType;
 
         // フレームワークのリダイレクト機能を使用してエラーメッセージをフラッシュ
+        // $_SESSION['error'] = $errorMessage;
         return redirect()->route('admins.create')->with('error', $errorMessage);
     }
 
