@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-// use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class Classes extends Model
 {
@@ -57,45 +56,4 @@ class Classes extends Model
             ->where('id', $classId)
             ->first();
     }
-
-    // 以下StudentTeacher.phpに移動
-    // 生徒・教師データ挿入
-    // public function insertStudentOrTeacher($table, $email, $hashedPassword, $name, $kana, $grade, $className, $permission)
-    // {
-    //     // global $pdo;
-
-    //     // DBスキーマ (id, name, kana, email, password, grade, class, permission) に合わせる
-    //     // $stmt = $pdo->prepare("INSERT INTO `{$table}` (email, password, name, kana, grade, class, permission) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    //     // class_idをclassカラムへ、permissionをwriteで設定
-    //     // $stmt->execute([$email, $hashedPassword, $name, $kana, $grade, $className, $permission]);
-
-    //     // 動的にテーブル名を変更する場合はクエリビルダー（DB）使用
-    //     DB::table($table)->insert([
-    //         'email' => $email,
-    //         'password' => $hashedPassword,
-    //         'name' => $name,
-    //         'kana' => $kana,
-    //         'grade' => $grade,
-    //         'class' => $className,
-    //         'permission' => $permission
-    //     ]);
-    // }
-
-    // 以下Admin.phpに移動
-    // // 管理者データ挿入
-    // public function insertAdmin($email, $hashedPassword, $name, $kana)
-    // {
-    //     global $pdo;
-
-    //     // DBスキーマ (id, name, kana, email, password) に合わせる
-    //     // $stmt = $pdo->prepare("INSERT INTO admins (email, password, name, kana) VALUES (?, ?, ?, ?)");
-    //     // $stmt->execute([$email, $hashedPassword, $name, $kana]);
-
-    //     Admin::insert([
-    //         'email' => $email,
-    //         'password' => $hashedPassword,
-    //         'name' => $name,
-    //         'kana' => $kana
-    //     ]);
-    // }
 }

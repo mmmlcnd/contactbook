@@ -5,8 +5,6 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\AdminController;
-// use App\Http\Controllers\AdminUserController;
-// use App\Http\Controllers\EntryController;
 
 //デフォルト画面
 Route::get('/', function () {
@@ -69,15 +67,6 @@ Route::prefix('teachers')->group(function () {
 // Route::resource 以下2つのルート生成
 // 1. GET /admins/users/create -> AdminController@create (フォーム表示)
 // 2. POST /admins/users       -> AdminController@store (登録処理)
-
-//管理者ユーザー作成画面
-// Route::resource('users', AdminController::class)->only([
-//     'create',
-//     'store'
-// ])->names([
-//     'create' => 'admins.create', // showUserManagementに対応
-//     'store'  => 'admins.store',  // create (ユーザー登録)に対応
-// ]);
 
 Route::prefix('admins')->group(function () {
     // 管理者用ダッシュボード

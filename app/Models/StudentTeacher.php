@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-// DynamicTableManagerのような名前に変更を推奨します
 class StudentTeacher extends Model
 {
     // Eloquentの自動タイムスタンプ機能を無効にする（このModelではクエリビルダを使うため）
@@ -35,7 +34,7 @@ class StudentTeacher extends Model
             'name' => $name,
             'kana' => $kana,
             'grade' => $grade,
-            'class' => $className,
+            'class_name' => $className,
             'permission' => $permission,
             'created_at' => now(), // 必須: タイムスタンプを手動で設定
             'updated_at' => now(), // 必須: タイムスタンプを手動で設定

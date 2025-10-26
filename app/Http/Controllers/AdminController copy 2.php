@@ -7,7 +7,6 @@ use App\Models\Classes;
 use App\Models\StudentTeacher;
 use App\Models\Admin;
 use Exception;
-use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
@@ -122,15 +121,8 @@ class AdminController extends Controller
                     return $this->redirectBackWithUserType($userType, '無効なユーザー種別です。');
             }
         } catch (Exception $e) {
-
-            // 🚨 ここでLaravelのログに記録
-            Log::error("Registration failed: " . $e->getMessage());
-
             // エラーロギングとユーザーフレンドリーなメッセージ
             error_log("Database Error in createUser: " . $e->getMessage());
-
-            // 💡 画面に詳細なエラーメッセージを出す 💡
-            $detailedError = 'ユーザー登録中にエラーが発生しました。詳細: ' . $e->getMessage();
 
             // エラーメッセージを表示
             return $this->redirectBackWithUserType($userType, 'ユーザー登録中にデータベースエラーが発生しました。エラーコード: ' . $e->getCode() . ' 詳細: ' . $e->getMessage());

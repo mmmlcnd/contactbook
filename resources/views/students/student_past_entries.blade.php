@@ -9,9 +9,7 @@
             連絡帳の提出履歴
         </h1>
 
-        {{-- -------------------------------------------------- --}}
         {{-- 月ナビゲーションとタイトル --}}
-        {{-- -------------------------------------------------- --}}
         <div class="flex items-center justify-between bg-indigo-50 p-4 rounded-lg mb-8 shadow-inner">
             <a href="?month={{ $previousMonth }}" class="text-indigo-600 hover:text-indigo-800 transition duration-150">
                 <i class="fas fa-chevron-left"></i> 前月へ
@@ -24,9 +22,7 @@
             </a>
         </div>
 
-        {{-- -------------------------------------------------- --}}
         {{-- 連絡帳一覧 --}}
-        {{-- -------------------------------------------------- --}}
         <div class="space-y-6">
             @if (empty($entries))
             {{-- データがない場合の表示 --}}
@@ -97,9 +93,7 @@
             @endif
         </div>
 
-        {{-- -------------------------------------------------- --}}
         {{-- ページ下部のリンク --}}
-        {{-- -------------------------------------------------- --}}
         <div class="mt-10 pt-6 border-t border-gray-200 flex justify-center">
             <a href="/students/entries/create" class="inline-flex items-center text-lg font-bold text-indigo-600 hover:text-indigo-800 transition duration-150">
                 <i class="fas fa-plus-circle mr-2"></i> 新しく連絡帳を提出する

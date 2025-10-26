@@ -124,26 +124,26 @@ class StudentController extends Controller
     //     $pastEntries = [];
 
     //     try {
-    //         $pdo = $this->getPdo();
+    //         // $pdo = $this->getPdo();
 
-    //         // 自身の全提出履歴を、最新の日付順に取得する
-    //         $sql = "
-    //             SELECT
-    //                 e.*,
-    //                 rh.stamped_at,
-    //                 t.name AS teacher_name,
-    //                 s.name AS stamp_name
-    //             FROM entries e
-    //             LEFT JOIN read_histories rh ON e.id = rh.entry_id
-    //             LEFT JOIN teachers t ON rh.teacher_id = t.id
-    //             LEFT JOIN stamps s ON rh.stamp_id = s.id
-    //             WHERE e.student_id = ?
-    //             ORDER BY e.record_date DESC, e.id DESC
-    //         ";
+    //         // // 自身の全提出履歴を、最新の日付順に取得する
+    //         // $sql = "
+    //         //     SELECT
+    //         //         e.*,
+    //         //         rh.stamped_at,
+    //         //         t.name AS teacher_name,
+    //         //         s.name AS stamp_name
+    //         //     FROM entries e
+    //         //     LEFT JOIN read_histories rh ON e.id = rh.entry_id
+    //         //     LEFT JOIN teachers t ON rh.teacher_id = t.id
+    //         //     LEFT JOIN stamps s ON rh.stamp_id = s.id
+    //         //     WHERE e.student_id = ?
+    //         //     ORDER BY e.record_date DESC, e.id DESC
+    //         // ";
 
-    //         $stmt = $pdo->prepare($sql);
-    //         $stmt->execute([$studentId]);
-    //         $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+    //         // $stmt = $pdo->prepare($sql);
+    //         // $stmt->execute([$studentId]);
+    //         // $results = $stmt->fetchAll(PDO::FETCH_OBJ);
 
     //         // 日付ごとにエントリと履歴をグループ化
     //         $groupedEntries = [];
