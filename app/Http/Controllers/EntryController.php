@@ -40,12 +40,12 @@ class EntryController extends Controller
     }
 
     // 提出状況を取得し、一覧画面に渡す処理
-    public function status()
-    {
-        // 担当クラスの生徒とその提出状況を取得
-        // PoCなので全生徒を取得
-        $students = StudentTeacher::with('user', 'class', 'entries')->get();
+    // public function status()
+    // {
+    //     // 担当クラスの生徒とその提出状況を取得
+    //     // PoCなので全生徒を取得
+    //     $students = StudentTeacher::with('user', 'class', 'entries')->get();
 
-        return view('entries.status', compact('students'));
-    }
+    //     return view('entries.status', compact('students'));
+    // }
 }

@@ -12,8 +12,8 @@ class Classes extends Model
 
     // 一括代入を許可するカラム
     protected $fillable = [
-        'grade', // 学年（例: 1, 2, 3）
-        'name',  // クラス名（例: A組, B組）
+        'grade', // 学年（1, 2, 3）
+        'name',  // クラス名（A組, B組）
     ];
 
     // 学年・クラスに所属する生徒（1対多）
