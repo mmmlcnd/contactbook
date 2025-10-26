@@ -31,12 +31,6 @@ class Classes extends Model
     // classesテーブルからクラス一覧を取得する
     public function getAllOrderedClasses()
     {
-        // global $pdo;
-
-        // $stmt = $pdo->prepare("SELECT id, name, grade FROM classes ORDER BY grade ASC, id ASC");
-        // $stmt->execute();
-        // return $stmt->fetchAll(PDO::FETCH_OBJ);
-
         return Classes::select('id', 'name', 'grade')
             ->orderBy('grade', 'asc')
             ->orderBy('id', 'asc')
@@ -46,12 +40,6 @@ class Classes extends Model
     // classesテーブルからgradeとnameを取得
     public function getGradesAndNames(int $classId)
     {
-        // global $pdo;
-
-        // $stmt = $pdo->prepare("SELECT grade, name FROM classes WHERE id = :classId");
-        // $stmt->execute(['classId' => $classId]);
-        // return $stmt->fetch(PDO::FETCH_ASSOC);
-
         return Classes::select('grade', 'name')
             ->where('id', $classId)
             ->first();

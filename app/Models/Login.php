@@ -20,12 +20,6 @@ class Login extends Model
         }
 
         // メールアドレスでユーザーレコードを取得
-
-        // PHPでの書き方
-        // $stmt = $pdo->prepare("SELECT * FROM `{$table}` WHERE email = :email");
-        // $stmt->execute([':email' => $email]);
-        // $user = $stmt->fetch(\PDO::FETCH_OBJ);
-
         // 動的にテーブル名を変更する場合はクエリビルダー（DB）使用
         $user = DB::table($table)
             ->where('email', $email) //WHERE email = :emailに相当

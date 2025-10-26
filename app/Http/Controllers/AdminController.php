@@ -69,7 +69,6 @@ class AdminController extends Controller
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         $classesModel = new Classes();
-        // $adminModel = new Admin();
 
         try {
             // 教師・生徒登録の場合、クラスIDの検証とクラス情報（学年・クラス名）の取得を行う
