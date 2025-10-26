@@ -69,7 +69,7 @@ class AdminController extends Controller
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         $classesModel = new Classes();
-        $adminModel = new Admin();
+        // $adminModel = new Admin();
 
         try {
             // 教師・生徒登録の場合、クラスIDの検証とクラス情報（学年・クラス名）の取得を行う
@@ -114,7 +114,12 @@ class AdminController extends Controller
                     break;
 
                 case 'admin':
-                    $adminModel->insertAdmin($email, $hashedPassword, $name, $kana);
+                    Admin::create([
+                        'email' => $email,
+                        'password' => $hashedPassword,
+                        'name' => $name,
+                        'kana' => $kana
+                    ]);
 
                     $message = '管理者ユーザー（' . htmlspecialchars($name) . '）が登録されました。';
                     break;
