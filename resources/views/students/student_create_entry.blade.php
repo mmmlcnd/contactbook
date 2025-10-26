@@ -51,7 +51,7 @@ $reportDateText = $reportDate->format('Y年m月d日');
         @endif
 
         {{-- 連絡帳提出フォーム --}}
-        <form action="/students/entries/create" method="POST" class="space-y-8">
+        <form action="{{ route('students.entries.store') }}" method="POST" class="space-y-8">
             <input type="hidden" name="_method" value="POST">
             @csrf
 

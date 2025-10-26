@@ -8,7 +8,6 @@ use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\Admin;
 use Exception;
-use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
@@ -84,41 +83,21 @@ class AdminController extends Controller
             switch ($userType) {
                 case 'student':
 
-                    Student::create([
-                        'email' => $email,
-                        'password' => $hashedPassword,
-                        'name' => $name,
-                        'kana' => $kana,
-                        'grade' => $grade,
-                        'class_name' => $className,
-                        'permission' => 'write',
-                    ]);
+                    Student::createStudent($email, $hashedPassword, $name, $kana, $grade, $className, 'write');
 
                     $message = '生徒ユーザー（' . htmlspecialchars($name) . '）が登録されました。';
                     break;
 
                 case 'teacher':
 
-                    Teacher::create([
-                        'email' => $email,
-                        'password' => $hashedPassword,
-                        'name' => $name,
-                        'kana' => $kana,
-                        'grade' => $grade,
-                        'class_name' => $className,
-                        'permission' => 'read',
-                    ]);
+                    Teacher::createTeacher($email, $hashedPassword, $name, $kana, $grade, $className, 'read');
 
                     $message = '教師ユーザー（' . htmlspecialchars($name) . '）が登録されました。';
                     break;
 
                 case 'admin':
-                    Admin::create([
-                        'email' => $email,
-                        'password' => $hashedPassword,
-                        'name' => $name,
-                        'kana' => $kana
-                    ]);
+
+                    Admin::createAdmin($email, $hashedPassword, $name, $kana);
 
                     $message = '管理者ユーザー（' . htmlspecialchars($name) . '）が登録されました。';
                     break;

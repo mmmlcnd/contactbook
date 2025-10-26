@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class Entry extends Model
 {
@@ -37,13 +36,30 @@ class Entry extends Model
     //     return $this->hasMany(\App\Models\ReadHistory::class);
     // }
 
+    /**
+     * 特定の生徒と特定の日付のエントリ数をカウント
+     *
+     * @param int $studentId
+     * @param string $recordDate
+     * @return int
+     */
     public static function countEntriesForStudentAndDate($studentId, $recordDate)
     {
-        return Entry::where('student_id', $studentId)
+        return self::where('student_id', $studentId)
             ->where('record_date', $recordDate)
             ->count();
     }
 
+    /**
+     * 新しい連絡帳エントリを挿入。
+     *
+     * @param int $studentId
+     * @param string $recordDate
+     * @param string $physical
+     * @param string $mental
+     * @param string $content
+     * @return \App\Models\Entry
+     */
     public static function insertEntry($studentId, $recordDate, $physical, $mental, $content)
     {
         return Entry::create([
@@ -56,35 +72,15 @@ class Entry extends Model
         ]);
     }
 
+    /**
+     * 特定の生徒の過去のエントリをすべて取得し、日付の降順でソート
+     *
+     * @param int $studentId
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
     public static function showPastEntries($studentId)
     {
-        // やりたいこと
-        // ログインしている生徒の照合→コントローラーでやる？
-        // その生徒の過去のンエントリーを月ごとに表示する
-
-        // $pdo = $this->getPdo();
-
-        // // 自身の全提出履歴を、最新の日付順に取得する
-        // $sql = "
-        //     SELECT
-        //         e.*,
-        //         rh.stamped_at,
-        //         t.name AS teacher_name,
-        //         s.name AS stamp_name
-        //     FROM entries e
-        //     LEFT JOIN read_histories rh ON e.id = rh.entry_id
-        //     LEFT JOIN teachers t ON rh.teacher_id = t.id
-        //     LEFT JOIN stamps s ON rh.stamp_id = s.id
-        //     WHERE e.student_id = ?
-        //     ORDER BY e.record_date DESC, e.id DESC
-        // ";
-
-        // $stmt = $pdo->prepare($sql);
-        // $stmt->execute([$studentId]);
-        // $results = $stmt->fetchAll(PDO::FETCH_OBJ);
-
-        return Entry::select()
-            ->where('student_id', $studentId)
+        return self::where('student_id', $studentId)
             ->orderBy('record_date', 'desc')
             ->get();
     }

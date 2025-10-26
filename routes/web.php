@@ -34,12 +34,16 @@ Route::post('/logout/{role}', [LoginController::class, 'logout'])->name('logout'
 Route::prefix('students')->group(function () {
     // 生徒用ダッシュボード
     Route::get('dashboard', [StudentController::class, 'dashboard'])->name('students.dashboard');
-    // 生徒用連絡帳入力画面
-    Route::get('entries/create', [StudentController::class, 'showCreateEntryForm'])->name('students.entries.create');
-    // 入力内容を保存するPOSTルート
-    Route::post('entries/create', [StudentController::class, 'createEntry']);
+    // // 生徒用連絡帳入力画面
+    Route::resource('entries', StudentController::class)->only([
+        'create',
+        'store'
+    ])->names([
+        'create' => 'students.entries.create',
+        'store' => 'students.entries.store'
+    ]);
     // 連絡帳履歴画面
-    Route::get('entries/past', [StudentController::class, 'past'])->name('students.entries.past');
+    Route::get('entries/past', [StudentController::class, 'showPastEntries'])->name('students.entries.past');
 });
 
 // --------------------
