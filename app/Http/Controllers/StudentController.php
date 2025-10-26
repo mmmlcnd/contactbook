@@ -100,7 +100,7 @@ class StudentController extends Controller
                 return redirect()->route('students.entries.create');
             }
 
-            Entry::insertEntry($studentId, $recordDate, $physical, $mental, $content);
+            Entry::createEntry($studentId, $recordDate, $physical, $mental, $content);
 
             $_SESSION['success_message'] = '連絡帳が正常に提出されました。先生の確認をお待ちください。';
             return redirect()->route('students.entries.create');
@@ -114,36 +114,43 @@ class StudentController extends Controller
     }
 
     /**
-     * 過去提出履歴を表示 (F-4.2)
+     * 過去提出履歴を表示
      */
-    public function showPastEntries()
+    public function showPastEntries(Request $request)
     {
         if (!$this->checkAuth()) return;
 
         $studentId = $this->getStudentId();
         $pastEntries = [];
 
+        // 月のナビゲーション変数の設定
+        // URLパラメータから表示する月を取得 (例: ?month=2025-09)。指定がなければ今月。
+        $currentMonth = $request->input('month', date('Y-m'));
+
+        // 日付操作のためにDateTimeオブジェクトを作成 (月の初日を設定)
         try {
-            $pdo = $this->getPdo();
+            $date = new \DateTime($currentMonth . '-01');
+        } catch (\Exception $e) {
+            // 無効な形式の場合、今月をデフォルトとする
+            $date = new \DateTime(date('Y-m-01'));
+            $currentMonth = date('Y-m');
+        }
 
-            // 自身の全提出履歴を、最新の日付順に取得する
-            $sql = "
-                SELECT
-                    e.*,
-                    rh.stamped_at,
-                    t.name AS teacher_name,
-                    s.name AS stamp_name
-                FROM entries e
-                LEFT JOIN read_histories rh ON e.id = rh.entry_id
-                LEFT JOIN teachers t ON rh.teacher_id = t.id
-                LEFT JOIN stamps s ON rh.stamp_id = s.id
-                WHERE e.student_id = ?
-                ORDER BY e.record_date DESC, e.id DESC
-            ";
+        // 前月を計算
+        $previousDate = clone $date;
+        $previousDate->modify('-1 month');
+        $previousMonth = $previousDate->format('Y-m');
 
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([$studentId]);
-            $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+        // 次月を計算
+        $nextDate = clone $date;
+        $nextDate->modify('+1 month');
+        $nextMonth = $nextDate->format('Y-m');
+
+        // 次月が現在月よりも未来であるかを判定
+        $isFutureMonth = $nextMonth > date('Y-m');
+
+        try {
+            $results = Entry::showPastEntries($studentId);
 
             // 日付ごとにエントリと履歴をグループ化
             $groupedEntries = [];
@@ -184,6 +191,10 @@ class StudentController extends Controller
         return view('students/student_past_entries', [
             'title' => '提出履歴',
             'pastEntries' => $pastEntries,
+            'currentMonth' => $currentMonth, // 現在表示している月 (YYYY-MM)
+            'previousMonth' => $previousMonth,       // 前の月 (YYYY-MM)
+            'nextMonth' => $nextMonth,       // 次の月 (YYYY-MM)
+            'isFutureMonth' => $isFutureMonth
         ]);
     }
 

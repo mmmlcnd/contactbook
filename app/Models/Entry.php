@@ -60,7 +60,7 @@ class Entry extends Model
      * @param string $content
      * @return \App\Models\Entry
      */
-    public static function insertEntry($studentId, $recordDate, $physical, $mental, $content)
+    public static function createEntry($studentId, $recordDate, $physical, $mental, $content)
     {
         return Entry::create([
             'student_id' => $studentId,

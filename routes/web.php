@@ -43,7 +43,7 @@ Route::prefix('students')->group(function () {
         'store' => 'students.entries.store'
     ]);
     // 連絡帳履歴画面
-    Route::get('entries/past', [StudentController::class, 'showPastEntries'])->name('students.entries.past');
+    Route::get('past/entries', [StudentController::class, 'showPastEntries'])->name('students.past.entries');
 });
 
 // --------------------
