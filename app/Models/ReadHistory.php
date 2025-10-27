@@ -19,17 +19,11 @@ class ReadHistory extends Model
         'stamped_at',
     ];
 
-    /**
-     * Entryモデルとのリレーションシップ
-     */
     public function entry()
     {
         return $this->belongsTo(Entry::class, 'entry_id');
     }
 
-    /**
-     * Teacherモデルとのリレーションシップ
-     */
     public function teacher()
     {
         return $this->belongsTo(Teacher::class, 'teacher_id');

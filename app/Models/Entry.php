@@ -35,7 +35,7 @@ class Entry extends Model
     public function readHistories()
     {
         // entries.id が read_histories テーブルの entry_id に対応
-        return $this->hasMany(\App\Models\ReadHistory::class);
+        return $this->hasOne(\App\Models\ReadHistory::class, 'entry_id');
     }
 
     /**
@@ -52,7 +52,7 @@ class Entry extends Model
     }
 
     /**
-     * 指定された月のデータに絞り込むローカルスコープ（記録日ベース）
+     * 指定された月のデータに絞り込むローカルスコープ
      */
     public function scopeForMonth($query, $date)
     {

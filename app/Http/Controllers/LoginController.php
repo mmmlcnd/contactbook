@@ -55,15 +55,15 @@ class LoginController extends Controller
                 return redirect()->route($table . '.dashboard');
             } else {
                 $error =  'メールアドレスまたはパスワードが間違っています。';
-            }
-        }
 
-        if ($table === 'students') {
-            return view('auth.student_login', compact('error'));
-        } else if ($table === 'teachers') {
-            return view('auth.teacher_login', compact('error'));
-        } else {
-            return view('auth.admin_login', compact('error'));
+                if ($table === 'students') {
+                    return view('auth.student_login', compact('error'));
+                } else if ($table === 'teachers') {
+                    return view('auth.teacher_login', compact('error'));
+                } else {
+                    return view('auth.admin_login', compact('error'));
+                }
+            }
         }
     }
 

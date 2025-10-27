@@ -30,9 +30,6 @@ class Student extends Model
         ]);
     }
 
-    /**
-     * 提出物（Entry）を取得するリレーション。
-     */
     public function entries()
     {
         // 'foreign_key' は Entry テーブルの student_id カラム
