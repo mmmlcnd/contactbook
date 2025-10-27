@@ -20,7 +20,7 @@ class ReadHistory extends Model
     ];
 
     /**
-     * Entryモデルとのリレーションシップ（この確認履歴がどの連絡帳に属するか）
+     * Entryモデルとのリレーションシップ
      */
     public function entry()
     {

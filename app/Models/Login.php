@@ -27,32 +27,14 @@ class Login extends Model
 
         // ユーザーが見つからない場合は失敗
         if (!$user) {
-            return false;
-        } else {
-            // ユーザーが見つかったらパスワードの検証
-            if (password_verify($password, $user->password)) {
-
-                if (session_status() == PHP_SESSION_NONE) {
-                    session_start();
-                }
-
-                $_SESSION['user_id'] = $user->id;
-                $_SESSION['user_name'] = $user->name;
-
-                if ($table === 'students') {
-                    $_SESSION['user_type'] = 'student';
-                } else if ($table === 'teachers') {
-                    $_SESSION['user_type'] = 'teacher';
-                } else {
-                    $_SESSION['user_type'] = 'admin';
-                }
-
-                return true;
-            } else {
-                return false;
-            }
+            return null;
         }
 
-        return null; // 認証失敗
+        // ユーザーが見つかったらパスワードの検証
+        if (password_verify($password, $user->password)) {
+            return $user; //認証成功（ユーザーオブジェクトを返す）
+        } else {
+            return false; //パスワード不一致
+        }
     }
 }

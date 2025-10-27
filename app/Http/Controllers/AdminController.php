@@ -128,10 +128,4 @@ class AdminController extends Controller
         // $_SESSION['error'] = $errorMessage;
         return redirect()->route('admins.create')->with('error', $errorMessage);
     }
-
-    // クラス管理画面表示
-    // public function manageClasses()
-    // {
-    //     return view('admins.admin_manage_classes');
-    // }
 }
