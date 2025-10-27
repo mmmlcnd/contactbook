@@ -43,7 +43,7 @@
                 <a href="/teachers/dashboard" class="hover:bg-indigo-700 p-2 rounded transition duration-150 flex items-center">
                     <i class="fas fa-home mr-1"></i> ダッシュボード
                 </a>
-                <a href="/teachers/status" class="hover:bg-indigo-700 p-2 rounded transition duration-150 flex items-center font-bold bg-indigo-700">
+                <a href="/teachers/status" class="hover:bg-indigo-700 p-2 rounded transition duration-150 flex items-center">
                     <i class="fas fa-bell mr-1"></i> 提出確認
                 </a>
                 <?php elseif($role == 'student'): ?>
@@ -54,7 +54,7 @@
                 <a href="/students/entries/create" class="hover:bg-indigo-700 p-2 rounded transition duration-150 flex items-center">
                     <i class="fas fa-pencil-alt mr-1"></i> 連絡帳提出
                 </a>
-                <a href="/students/past/entries" class="hover:bg-indigo-700 p-2 rounded transition duration-150 flex items-center">
+                <a href="/students/entries/past" class="hover:bg-indigo-700 p-2 rounded transition duration-150 flex items-center">
                     <i class="fas fa-history mr-1"></i> 提出履歴
                 </a>
                 <?php endif; ?>

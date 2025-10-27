@@ -35,6 +35,7 @@ class Student extends Model
      */
     public function entries()
     {
-        return $this->hasMany(\App\Models\Entry::class);
+        // 'foreign_key' は Entry テーブルの student_id カラム
+        return $this->hasMany(Entry::class, 'student_id');
     }
 }

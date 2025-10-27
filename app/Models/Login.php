@@ -36,6 +36,7 @@ class Login extends Model
                     session_start();
                 }
 
+                $_SESSION['user_id'] = $user->id;
                 $_SESSION['user_name'] = $user->name;
 
                 if ($table === 'students') {

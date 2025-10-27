@@ -2,7 +2,7 @@
 // $currentMonth (例: '2025-10') を DateTime オブジェクトに変換
 $dateObj = DateTime::createFromFormat('Y-m', $currentMonth);
 // 'Y年n月' の形式にフォーマット
-$displayMonth = $dateObj ? $dateObj->format('Y年n月') : $currentMonth;
+$displayCurrentMonth = $dateObj ? $dateObj->format('Y年n月') : $currentMonth;
 ?>
 
 
@@ -22,7 +22,7 @@ $displayMonth = $dateObj ? $dateObj->format('Y年n月') : $currentMonth;
                 <i class="fas fa-chevron-left"></i> 前月へ
             </a>
             <h2 class="text-xl md:text-2xl font-bold text-indigo-800">
-                <?php echo e($displayMonth); ?> の連絡帳
+                <?php echo e($displayCurrentMonth); ?> の連絡帳
             </h2>
             <a href="?month=<?php echo e($nextMonth); ?>" class="text-indigo-600 hover:text-indigo-800 transition duration-150 <?php if($isFutureMonth): ?> opacity-50 cursor-default <?php endif; ?>">
                 次月へ <i class="fas fa-chevron-right"></i>
@@ -31,26 +31,30 @@ $displayMonth = $dateObj ? $dateObj->format('Y年n月') : $currentMonth;
 
         
         <div class="space-y-6">
-            <?php if(empty($entries)): ?>
+            <?php if(empty($pastEntries)): ?>
             
             <div class="p-8 text-center bg-gray-100 rounded-lg border-2 border-dashed border-gray-300">
                 <p class="text-gray-600 text-lg font-medium">
-                    <?php echo e($displayMonth); ?>の提出履歴はありません。
+                    <?php echo e($displayCurrentMonth); ?>の提出履歴はありません。
                 </p>
             </div>
             <?php else: ?>
-            <?php $__currentLoopData = $entries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $entry): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php $__currentLoopData = $pastEntries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pastEntry): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php
+            $entry = $pastEntry['entry'];
+            $readHistory = $pastEntry['read_history'];
+            $reportDate = $entry['record_date'];
+            ?>
             
             <div class="bg-white border border-gray-200 rounded-xl shadow-lg hover:shadow-xl transition duration-300 ease-in-out p-5">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-3 mb-3">
                     
                     <div class="flex items-center mb-2 md:mb-0">
                         <span class="text-3xl font-extrabold text-gray-800 mr-3">
-                            <?php echo e(date('d', strtotime($entry->report_date))); ?>
-
+                            <?php echo e(date('d', strtotime($entry->record_date))); ?>日
                         </span>
                         <span class="text-base font-semibold text-indigo-600">
-                            (<?php echo e(date('曜', strtotime($entry->report_date))); ?>)
+                            （<?php echo e($dayOfWeek = ['日', '月', '火', '水', '木', '金', '土'][date('w', strtotime($reportDate))]); ?>）
                         </span>
                     </div>
 

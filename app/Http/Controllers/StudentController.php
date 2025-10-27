@@ -3,16 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\StudentTeacher;
 use App\Models\Entry;
-use App\Models\User;
-use PDO;
-
+use App\Models\Student;
+use Carbon\Carbon;
 
 class StudentController extends Controller
 {
     /**
-     * コンストラクタ: セッションを開始し、$_SESSIONを使用できるようにする
+     * コンストラクタ: セッションを開始
      */
     public function __construct()
     {
@@ -23,7 +21,7 @@ class StudentController extends Controller
     }
 
     /**
-     * 現在認証されている生徒のIDを取得する
+     * 現在認証されている生徒のIDを取得
      * @return int|null 生徒ID
      */
     private function getStudentId(): ?int
@@ -71,24 +69,47 @@ class StudentController extends Controller
     /**
      * 連絡帳をデータベースに保存する
      */
-    public function store()
+    public function store(Request $request)
     {
         if (!$this->checkAuth()) return;
 
         $studentId = $this->getStudentId();
 
-        // フォームデータの取得とサニタイズ
-        $physical = filter_input(INPUT_POST, 'condition_physical', FILTER_VALIDATE_INT);
-        $mental = filter_input(INPUT_POST, 'condition_mental', FILTER_VALIDATE_INT);
-        $content = trim(filter_input(INPUT_POST, 'content', FILTER_SANITIZE_SPECIAL_CHARS));
+        // IDが取得できなければエラーとしてリダイレクト
+        if (!$studentId) {
+            $_SESSION['error_message'] = 'ログイン中のユーザー情報が取得できませんでした。';
+            return redirect()->route('login.student');
+        }
+
+        // フォームデータ取得
+        $physical = $request->input('condition_physical');
+        $mental = $request->input('condition_mental');
+        $content = trim($request->input('content')); //不要な余白削除
         $recordDate = date('Y-m-d'); // 提出時の日付
 
-        // バリデーション
-        if ($physical === false || $mental === false || $physical < 1 || $physical > 5 || $mental < 1 || $mental > 5 || empty($content)) {
-            $_SESSION['error_message'] = '入力内容に誤りがあります。体調評価(1-5)と連絡内容が必須です。';
+        // 記録日を前登校日にする設定
+        $submitTime = Carbon::now(); //現在時刻
+        $recordDate = $submitTime->copy(); //記録日操作用
+        $dayOfWeek = $submitTime->dayOfWeek; // 曜日を数値で取得：0 (日) - 6 (土)
 
-            return redirect()->route('students.entries.create');
+        // 提出日を元に記録日確定
+        if ($dayOfWeek === Carbon::MONDAY) { // 月曜提出(-3日)
+            $recordDate->subDays(3);
+        } elseif ($dayOfWeek === Carbon::SUNDAY) { // 日曜提出(-2日)
+            $recordDate->subDays(2);
+        } else { // 火・水・木・金・土曜提出(-1日)
+            $recordDate->subDay();
         }
+
+        // 記録日の文字列化
+        $recordDateString = $recordDate->format('Y-m-d');
+
+        // バリデーション
+        // if ($physical === false || $mental === false || $physical < 1 || $physical > 5 || $mental < 1 || $mental > 5 || empty($content)) {
+        //     $_SESSION['error_message'] = '入力内容に誤りがあります。体調評価(1-5)と連絡内容が必須です。';
+
+        //     return redirect()->route('students.entries.create');
+        // }
 
         try {
             // 静的メソッドの呼び出し
@@ -118,83 +139,94 @@ class StudentController extends Controller
      */
     public function showPastEntries(Request $request)
     {
+        // 認証済み生徒ID取得
+        $studentId = $this->getStudentId();
+        if (!$studentId) {
+            redirect()->route('login.student');
+            exit;
+        }
+
+        // Studentモデルから生徒を取得
+        $student = Student::find($studentId);
+        if (!$student) {
+            // エラーメッセージを設定してリダイレクト
+            $_SESSION['error_message'] = '生徒情報が見つかりませんでした。';
+            return redirect()->route('login.student');
+        }
+
+        // 表示月（URLクエリパラメータを優先、なければ今月）
+        $selectedMonth = $request->input('month') ?? Carbon::now()->format('Y-m');
+        $date = Carbon::createFromFormat('Y-m', $selectedMonth);
+
+        $currentMonth = $date->format('Y-m');
+        $previousMonth = $date->copy()->subMonth()->format('Y-m');
+        $nextMonth = $date->copy()->addMonth()->format('Y-m');
+        $isFutureMonth = $date->isFuture() && !$date->isSameMonth(Carbon::now());
+        $displayMonth = $date->format('Y年n月');
+
+        // Studentモデルのリレーション (entries()) を通じてEntryを取得
+        $entries = $student->entries()
+            // Entryモデルのスコープ呼び出し
+            ->forMonth($date)
+            // Entryモデルのスコープ呼び出し
+            ->withReadHistoriesSorted()
+            ->get();
+
+        $pastEntries = [];
+
+        foreach ($entries as $entry) {
+            // $entry->readHistories で確認履歴が既にロードされている
+            $pastEntries[] = [
+                'entry' => $entry,
+                // リレーションから確認履歴を取得
+                'read_history' => $entry->readHistories,
+            ];
+        }
+
+        // 日付の降順に並び替え
+        usort($pastEntries, function ($a, $b) {
+            // bの日付とaの日付を比較して、降順 (新しい順) にする
+            return strcmp($b['entry']->record_date, $a['entry']->record_date);
+        });
+
+        return view('students/student_past_entries', [
+            'pastEntries' => $pastEntries,
+            'currentMonth' => $currentMonth,
+            'previousMonth' => $previousMonth,
+            'nextMonth' => $nextMonth,
+            'isFutureMonth' => $isFutureMonth,
+            'displayMonth' => $displayMonth,
+            'title' => '提出履歴',
+        ]);
+    }
+
+    /**
+     * 連絡帳詳細画面を表示
+     * @param int $id Entry ID
+     */
+    public function showEntryDetail(int $id)
+    {
         if (!$this->checkAuth()) return;
 
         $studentId = $this->getStudentId();
-        $pastEntries = [];
 
-        // 月のナビゲーション変数の設定
-        // URLパラメータから表示する月を取得 (例: ?month=2025-09)。指定がなければ今月。
-        $currentMonth = $request->input('month', date('Y-m'));
+        // 連絡帳をIDとログイン中の生徒IDで取得し、readHistoriesリレーションをEager Load
+        $entry = Entry::getForStudentDetail($id, $studentId);
 
-        // 日付操作のためにDateTimeオブジェクトを作成 (月の初日を設定)
-        try {
-            $date = new \DateTime($currentMonth . '-01');
-        } catch (\Exception $e) {
-            // 無効な形式の場合、今月をデフォルトとする
-            $date = new \DateTime(date('Y-m-01'));
-            $currentMonth = date('Y-m');
+        // 連絡帳が見つからない、または他の生徒のエントリーであればリダイレクト
+        if (!$entry) {
+            $_SESSION['error_message'] = '指定された連絡帳が見つかりませんでした。';
+            return redirect()->route('students.entries.past');
         }
 
-        // 前月を計算
-        $previousDate = clone $date;
-        $previousDate->modify('-1 month');
-        $previousMonth = $previousDate->format('Y-m');
+        // ビューは $entry と $readHistory を期待しているので変数を準備
+        $readHistory = $entry->readHistories;
 
-        // 次月を計算
-        $nextDate = clone $date;
-        $nextDate->modify('+1 month');
-        $nextMonth = $nextDate->format('Y-m');
-
-        // 次月が現在月よりも未来であるかを判定
-        $isFutureMonth = $nextMonth > date('Y-m');
-
-        try {
-            $results = Entry::showPastEntries($studentId);
-
-            // 日付ごとにエントリと履歴をグループ化
-            $groupedEntries = [];
-            foreach ($results as $row) {
-                $date = $row->record_date;
-                if (!isset($groupedEntries[$date])) {
-                    $groupedEntries[$date] = (object)[
-                        'entry' => (object)[
-                            'id' => $row->id,
-                            'record_date' => $row->record_date,
-                            'content' => $row->content,
-                            'condition_physical' => $row->condition_physical,
-                            'condition_mental' => $row->condition_mental,
-                            'is_read' => $row->is_read,
-                        ],
-                        'read_history' => []
-                    ];
-                }
-
-                // read_historyがある場合のみ追加
-                if ($row->stamped_at) {
-                    $groupedEntries[$date]->read_history[] = (object)[
-                        'teacher_name' => $row->teacher_name,
-                        'stamp_name' => $row->stamp_name,
-                        'stamped_at' => $row->stamped_at,
-                    ];
-                }
-            }
-
-            // 連想配列を数値インデックスの配列に戻す
-            $pastEntries = array_values($groupedEntries);
-        } catch (\PDOException $e) {
-            error_log("Database error in showPastEntries: " . $e->getMessage());
-            $_SESSION['error_message'] = '提出履歴の取得中にエラーが発生しました。';
-        }
-
-        // F-4.2: 過去提出履歴を表示
-        return view('students/student_past_entries', [
-            'title' => '提出履歴',
-            'pastEntries' => $pastEntries,
-            'currentMonth' => $currentMonth, // 現在表示している月 (YYYY-MM)
-            'previousMonth' => $previousMonth,       // 前の月 (YYYY-MM)
-            'nextMonth' => $nextMonth,       // 次の月 (YYYY-MM)
-            'isFutureMonth' => $isFutureMonth
+        // ビューには $entry と $readHistory を渡します。
+        return view('students.student_entry_detail', [
+            'entry' => $entry,
+            'readHistory' => $readHistory, // Entryモデルのリレーションで取得済み
+            'title' => '連絡帳詳細',
         ]);
     }
 

@@ -31,10 +31,11 @@ Route::post('/logout/{role}', [LoginController::class, 'logout'])->name('logout'
 // --------------------
 // 生徒用画面
 // --------------------
+
 Route::prefix('students')->group(function () {
-    // 生徒用ダッシュボード
+    // ダッシュボード
     Route::get('dashboard', [StudentController::class, 'dashboard'])->name('students.dashboard');
-    // // 生徒用連絡帳入力画面
+    // 連絡帳入力画面
     Route::resource('entries', StudentController::class)->only([
         'create',
         'store'
@@ -43,12 +44,16 @@ Route::prefix('students')->group(function () {
         'store' => 'students.entries.store'
     ]);
     // 連絡帳履歴画面
-    Route::get('past/entries', [StudentController::class, 'showPastEntries'])->name('students.past.entries');
+    Route::get('entries/past', [StudentController::class, 'showPastEntries'])->name('students.entries.past');
+    // 連絡帳詳細画面
+    Route::get('entries/{id}', [StudentController::class, 'showEntryDetail'])->name('students.entries.detail')
+        ->where('id', '[0-9]+');
 });
 
 // --------------------
 // 教師用画面
 // --------------------
+
 Route::prefix('teachers')->group(function () {
     // 教師用ダッシュボード
     Route::get('dashboard', [TeacherController::class, 'dashboard'])->name('teachers.dashboard');
@@ -68,15 +73,13 @@ Route::prefix('teachers')->group(function () {
 // 管理者用画面
 // --------------------
 
-// Route::resource 以下2つのルート生成
-// 1. GET /admins/users/create -> AdminController@create (フォーム表示)
-// 2. POST /admins/users       -> AdminController@store (登録処理)
-
 Route::prefix('admins')->group(function () {
     // 管理者用ダッシュボード
     Route::get('dashboard', [AdminController::class, 'dashboard'])->name('admins.dashboard');
-
     //管理者ユーザー作成画面
+    // Route::resource 以下2つのルート生成
+    // 1. GET /admins/users/create -> AdminController@create (フォーム表示)
+    // 2. POST /admins/users       -> AdminController@store (登録処理)
     Route::resource('users', AdminController::class)->only([
         'create',
         'store'
@@ -84,10 +87,4 @@ Route::prefix('admins')->group(function () {
         'create' => 'admins.create',
         'store' => 'admins.store'
     ]);
-
-    // Route::get('users/create', [AdminController::class, 'create'])->name('admins.create');
-    // Route::post('users/create', [AdminController::class, 'store']);
-
-    // 管理者クラス管理画面
-    // Route::get('classes', [AdminController::class, 'manageClasses'])->name('classes');
 });

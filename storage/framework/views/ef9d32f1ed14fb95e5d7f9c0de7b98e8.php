@@ -1,21 +1,29 @@
 <?php $__env->startSection('title', '連絡帳提出'); ?>
 
 <?php $__env->startSection('content'); ?>
+
 <?php
 // 報告対象日を計算するロジック
-// 基本は「昨日」だが、月曜日の場合は「金曜日」とする。
+// 提出日に応じて、記録対象となる平日（月〜金）の日付を確定させる
+
 $today = new \DateTime('today');
-$dayOfWeek = (int) $today->format('w'); // 0 (Sun) to 6 (Sat)
+$dayOfWeek = (int) $today->format('w'); // 0 (日) - 6 (土)
 
-$reportDate = new \DateTime('yesterday'); // デフォルトは昨日
-$reportDayOfWeek = (int) $reportDate->format('w');
+$reportDate = clone $today; // 今日の日付をコピーし、ここから日数を遡る
 
-// 今日が月曜日 (1) なら、報告日は金曜日 (5)
-if ($dayOfWeek === 1) {
-// 月曜日なら3日前 (金曜日)
+// 曜日ごとに遡る日数を決定
+if ($dayOfWeek === 1) { // 提出日が月曜日
+// 月曜提出は前週の金曜日分（3日遡る: 月→日→土→金）
+$reportDate->modify('-3 days');
+} elseif ($dayOfWeek === 0) { // 提出日が日曜日
+// 日曜提出は金曜日分（2日遡る: 日→土→金）
 $reportDate->modify('-2 days');
+} else { // 提出日が火・水・木・金・土曜・
+// 火〜土曜提出は前日の平日分（1日遡る）
+$reportDate->modify('-1 day');
 }
 
+// 確定した報告対象日を日本語形式に変換
 $reportDateText = $reportDate->format('Y年m月d日');
 ?>
 
