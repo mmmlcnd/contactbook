@@ -10,8 +10,22 @@ return new class extends Migration
     {
         Schema::create('students', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // users と1対1
-            $table->foreignId('class_id')->constrained('classes')->onDelete('cascade'); // クラスID
+
+            // 必須情報
+            $table->string('name', 100)->nullable(false); // ★ nameは必須です
+            $table->string('kana', 100)->nullable(false);
+
+            // 認証情報 (生徒もログイン可能と仮定)
+            $table->string('email', 255)->unique();
+            $table->string('password', 255);
+
+            // クラス情報
+            $table->unsignedTinyInteger('grade')->nullable(false);
+            $table->string('class_name', 10)->nullable(false);
+
+            // 権限情報
+            $table->enum('permission', ['read', 'write'])->default('write');
+
             $table->timestamps();
         });
     }

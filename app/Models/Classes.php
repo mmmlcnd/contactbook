@@ -7,8 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Classes extends Model
 {
-    // テスト・シーディング用トレイト
-    // use HasFactory;
+    use HasFactory;
 
     // 一括代入を許可するカラム
     protected $fillable = [

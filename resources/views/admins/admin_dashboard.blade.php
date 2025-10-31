@@ -34,6 +34,7 @@
         </div>
 
         <!-- ログアウト -->
+        <?php /*
         <div class="mt-8 pt-4 border-t border-gray-200">
             <form action="{{ route('logout', ['role' => 'admin']) }}" method="POST">
                 @csrf
@@ -42,6 +43,7 @@
                 </button>
             </form>
         </div>
+        */ ?>
 
     </div>
 </div>

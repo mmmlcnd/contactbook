@@ -48,7 +48,7 @@
         </div>
 
         <!-- ログアウト -->
-        <div class="mt-8 pt-4 border-t border-gray-200">
+        <?php /* <div class="mt-8 pt-4 border-t border-gray-200">
             <form method="POST" action="{{ route('logout', ['role' => 'teacher']) }}">
                 @csrf
                 <button type="submit" class="w-full flex items-center justify-center px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-150 ease-in-out shadow-sm">
@@ -56,6 +56,7 @@
                 </button>
             </form>
         </div>
+        */ ?>
 
     </div>
 </div>

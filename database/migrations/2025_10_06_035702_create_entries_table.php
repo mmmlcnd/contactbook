@@ -10,14 +10,26 @@ return new class extends Migration
     {
         Schema::create('entries', function (Blueprint $table) {
             $table->id();
+
+            // 外部キー (fk_student: entries.student_id -> students.id)
             $table->foreignId('student_id')->constrained('students')->onDelete('cascade');
-            $table->date('entry_date');
-            $table->text('content');
+
+            // 体調・精神状態 (SQLスキーマではTINYINTやINTを使用)
+            // 3～5の値を保存するため、TINYINT (unsignedTinyInteger) が適切
+            $table->unsignedTinyInteger('condition_physical')->nullable(false);
+            $table->unsignedTinyInteger('condition_mental')->nullable(false);
+
+            // 記録日と内容
+            $table->date('record_date')->nullable(false);
+            $table->text('content')->nullable(false);
+
+            // 既読フラグ (SQLスキーマではTINYINT)
             $table->boolean('is_read')->default(false);
+
             $table->timestamps();
 
             // 生徒ごとに同じ日付の重複登録を防ぐ
-            $table->unique(['student_id', 'entry_date']);
+            $table->unique(['student_id', 'record_date']);
         });
     }
 

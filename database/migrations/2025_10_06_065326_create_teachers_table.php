@@ -12,9 +12,21 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('teachers', function (Blueprint $table) {
-            $table->id(); // 主キー
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // users.id 外部キー
-            $table->foreignId('class_id')->nullable()->constrained()->onDelete('set null'); // classes.id 外部キー（クラス未所属も可）
+            $table->id();
+            $table->string('name', 100)->nullable(false);
+            $table->string('kana', 100)->nullable(false);
+
+            // 認証情報
+            $table->string('email', 255)->unique(); // UNIQUEが必須
+            $table->string('password', 255);
+
+            // 担当クラス情報 (複合キーとして使用)
+            $table->unsignedTinyInteger('grade')->nullable(false);
+            $table->string('class_name', 10)->nullable(false);
+
+            // 権限情報
+            $table->enum('permission', ['read', 'full'])->default('read');
+
             $table->timestamps();
         });
     }

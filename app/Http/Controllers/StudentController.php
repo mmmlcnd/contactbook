@@ -26,7 +26,7 @@ class StudentController extends Controller
      */
     private function getStudentId(): ?int
     {
-        // F-1.3に基づいてセッションからユーザータイプとIDを取得
+        // セッションからユーザータイプとIDを取得
         if (($_SESSION['user_type'] ?? null) !== 'student') {
             return null;
         }

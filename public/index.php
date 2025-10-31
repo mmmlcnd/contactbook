@@ -5,7 +5,7 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 // データベース接続を確立し、$pdo 変数をグローバルに定義する
-require_once __DIR__ . '/../database/db_connect.php';
+// require_once __DIR__ . '/../database/db_connect.php';
 
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;

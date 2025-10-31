@@ -60,11 +60,11 @@
                 <?php endif; ?>
 
                 
-                <?php if($role): ?>
+                <?php /* @if ($role)
                 <a href="/logout" class="bg-red-500 hover:bg-red-600 p-2 rounded transition duration-150 flex items-center font-bold">
                     <i class="fas fa-sign-out-alt mr-1"></i> ログアウト
                 </a>
-                <?php endif; ?>
+                @endif */ ?>
             </nav>
         </div>
     </header>

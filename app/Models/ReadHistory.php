@@ -16,6 +16,7 @@ class ReadHistory extends Model
     protected $fillable = [
         'entry_id',
         'teacher_id',
+        'stamp_id',
         'stamped_at',
     ];
 
@@ -27,5 +28,10 @@ class ReadHistory extends Model
     public function teacher()
     {
         return $this->belongsTo(Teacher::class, 'teacher_id');
+    }
+
+    public function stamp()
+    {
+        return $this->belongsTo(Stamp::class);
     }
 }

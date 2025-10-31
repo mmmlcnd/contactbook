@@ -3,50 +3,73 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Teacher;
+use App\Models\Entry;
+use App\Models\Student;
+use Carbon\Carbon;
 
 class TeacherController extends Controller
 {
+    protected $teacher = null;
+
     /**
-     * セッションIDに基づいて教師情報をデータベースから取得する
-     * @param ?int $userId セッションに保存されているユーザーID (null許容)
-     * @return object|null 教師データ（stdClassオブジェクト）
+     * コンストラクタ: セッションを開始
      */
-    protected function getTeacherData(?int $userId): ?\stdClass
+    public function __construct()
     {
-        global $pdo;
-
-        if (!$pdo || $userId === null) {
-            return null;
-        }
-
-        try {
-            // teachersテーブルからIDでユーザーレコードを取得
-            $stmt = $pdo->prepare("SELECT * FROM `teachers` WHERE id = :id");
-            $stmt->execute([':id' => $userId]);
-            $teacher = $stmt->fetch(\PDO::FETCH_OBJ);
-
-            return $teacher ?: null;
-        } catch (\PDOException $e) {
-            error_log("TeacherController DB Error: " . $e->getMessage());
-            return null;
+        // PHPのセッションがまだ開始されていない場合にのみ開始する
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
         }
     }
 
     /**
-     * 教師のダッシュボード画面を表示する
+     * 認証された教師のIDをセッションから取得
+     * * @return int|null
+     */
+    private function getTeacherId(): ?int
+    {
+        return session()->get('teacher_id') ?? null;
+    }
+
+    /**
+     * 認証チェックと教師データの取得
+     * @return Teacher|null 認証済み教師オブジェクト
+     */
+    private function checkAuthAndGetTeacher(): ?Teacher
+    {
+        $teacherId = $this->getTeacherId();
+        if (!$teacherId) {
+            return null;
+        }
+
+        // Eloquentを使って教師データを取得
+        $teacher = Teacher::find($teacherId);
+
+        return $teacher;
+    }
+
+    /**
+     * 認証チェックとリダイレクト
+     * @return Teacher|null 認証済み教師オブジェクト、未認証ならリダイレクトしnullを返す
+     */
+    private function checkAuth()
+    {
+        $teacher = $this->checkAuthAndGetTeacher();
+
+        if (!$teacher) {
+            return redirect()->route('login.teacher');
+        }
+        $this->teacher = $teacher;
+        return $teacher;
+    }
+
+    /**
+     * 教師用ダッシュボードを表示
      */
     public function dashboard()
     {
-        $loggedInUserId = $_SESSION['user_id'] ?? null;
-        $teacher = $this->getTeacherData($loggedInUserId);
-
-        if (!$teacher) {
-            // 書き方直す
-            header("Location: /login/teacher");
-            exit;
-        }
-
-        return view('teachers.teacher_dashboard', compact('teacher'));
+        return view('teachers.teacher_dashboard');
     }
 
     /**
@@ -54,85 +77,42 @@ class TeacherController extends Controller
      */
     public function showSubmissionList()
     {
-        global $pdo;
-        $loggedInUserId = $_SESSION['user_id'] ?? null;
-        $teacher = $this->getTeacherData($loggedInUserId);
+        $teacher = $this->checkAuth();
+        if (!$teacher) return; // checkAuth内でリダイレクト済み
 
-        // 認証チェック
-        if (!$teacher) {
-            // 書き方直す
-            header("Location: /login/teacher");
-            exit;
-        }
+        // デバッグ用：取得された値を確認
+        dd("Grade:", $teacher->grade, "Class Name:", $teacher->class_name);
 
         // 教師データに担当クラス情報がない場合はエラー処理
-        if (empty($teacher->class)) {
-            return "エラー: 担当クラスが設定されていません。";
+        if (empty($teacher->grade) || empty($teacher->class_name)) {
+            return "エラー: 担当する学年または組が設定されていません。管理者にご確認ください。";
         }
 
-        // ★★★ 提出状況の確認対象日を設定 (2025-10-15の確認対象は2025-10-14) ★★★
-        $targetRecordDate = '2025-10-14';
+        // 提出状況の確認対象日を設定
+        $today = Carbon::today();
+        $targetRecordDate = '';
 
-        // --- 1. 担当クラスの生徒を取得 ---
+        if ($today->isMonday()) {
+            // 今日が月曜日なら、確認対象日は3日前（先週の金曜日）
+            $targetRecordDate = $today->subDays(3)->format('Y-m-d');
+        } else {
+            $targetRecordDate = $today->yesterday()->format('Y-m-d');
+        }
 
-        $students = [];
+        $loggedInUserId = $teacher->id;
+        $targetGrade = $teacher->grade;
+        $targetClassName = $teacher->class_name;
+
         try {
-            $stmt = $pdo->prepare("SELECT id, name FROM students WHERE class = :class_name ORDER BY id ASC");
-            $stmt->execute([':class_name' => $teacher->class]);
-            $students = $stmt->fetchAll(\PDO::FETCH_OBJ);
-        } catch (\PDOException $e) {
-            error_log("Students fetch error: " . $e->getMessage());
-            $students = [];
-        }
-
-        // --- 2. 各生徒の最新の連絡帳 (Entry) 情報を取得しマージ ---
-
-        $studentStatuses = [];
-        foreach ($students as $student) {
-            $status = new \stdClass();
-            $status->id = $student->id;
-            $status->name = $student->name;
-            $status->latest_entry = null;
-
-            try {
-                // record_date によるフィルタリングで、確認対象日のエントリーのみを取得
-                $stmt = $pdo->prepare("
-                    SELECT
-                        t1.id, t1.record_date, t1.content, t1.is_read, t2.stamped_at, t3.name AS stamp_name
-                    FROM
-                        entries t1
-                    LEFT JOIN
-                        read_histories t2 ON t1.id = t2.entry_id AND t2.teacher_id = :teacher_id
-                    LEFT JOIN
-                        stamps t3 ON t2.stamp_id = t3.id
-                    WHERE
-                        t1.student_id = :student_id AND t1.record_date = :target_date
-                    ORDER BY
-                        t1.id DESC
-                    LIMIT 1
-                ");
-                $stmt->execute([
-                    ':student_id' => $student->id,
-                    ':target_date' => $targetRecordDate,
-                    ':teacher_id' => $loggedInUserId,
-                ]);
-                $latestEntry = $stmt->fetch(\PDO::FETCH_OBJ);
-
-                if ($latestEntry) {
-                    $latestEntry->entry_date = $latestEntry->record_date;
-                    $status->latest_entry = $latestEntry;
-                }
-            } catch (\PDOException $e) {
-                error_log("Latest entry fetch error for student {$student->id}: " . $e->getMessage());
-            }
-
-            $studentStatuses[] = $status;
+            $studentStatuses = $teacher->getStudentsWithLatestEntryStatus($targetRecordDate, $loggedInUserId, $targetGrade, $targetClassName);
+        } catch (\Exception $e) {
+            error_log("Submission list fetch error: " . $e->getMessage());
+            return "データベースエラーが発生しました。生徒の提出状況が取得できませんでした。";
         }
 
         $teacherName = $teacher->name;
         $students = $studentStatuses;
 
-        // ビューを読み込み
         $viewName = 'teachers.teacher_status';
         return view($viewName, compact('teacherName', 'students'));
     }
@@ -143,56 +123,24 @@ class TeacherController extends Controller
      */
     public function readEntry(int $id)
     {
-        global $pdo;
-        $loggedInUserId = $_SESSION['user_id'] ?? null;
-        $teacher = $this->getTeacherData($loggedInUserId);
+        $teacher = $this->checkAuth();
+        if (!$teacher) return; // checkAuth内でリダイレクト済み
 
-        if (!$teacher) {
-            // 書き方直す
-            header("Location: /login/teacher");
-            exit;
-        }
+        $loggedInUserId = $teacher->id; // 不要だが、元のコードの慣習に合わせて残す
 
         try {
-            // 1. エントリーの詳細を取得
-            $stmt = $pdo->prepare("
-                SELECT
-                    e.*, s.name as student_name, s.class as student_class
-                FROM
-                    entries e
-                JOIN
-                    students s ON e.student_id = s.id
-                WHERE
-                    e.id = :entry_id
-            ");
-            $stmt->execute([':entry_id' => $id]);
-            $entry = $stmt->fetch(\PDO::FETCH_OBJ);
+            // モデルに処理を委譲: Eloquent/DBファサードを使用してデータを取得
+            $data = Teacher::getEntryDetailsForRead($id);
 
-            if (!$entry) {
+            if (!$data) {
                 return "エラー: 該当するエントリーが見つかりません。";
             }
 
-            // 2. 既読履歴（スタンプ情報）を取得
-            $stmt = $pdo->prepare("
-                SELECT
-                    rh.stamped_at, t.name as teacher_name, st.name as stamp_name
-                FROM
-                    read_histories rh
-                JOIN
-                    teachers t ON rh.teacher_id = t.id
-                JOIN
-                    stamps st ON rh.stamp_id = st.id
-                WHERE
-                    rh.entry_id = :entry_id
-            ");
-            $stmt->execute([':entry_id' => $id]);
-            $readHistory = $stmt->fetchAll(\PDO::FETCH_OBJ);
+            $entry = $data['entry'];
+            $readHistory = $data['readHistory'];
+            $stamps = $data['stamps'];
 
-            // 3. 利用可能なスタンプ一覧を取得
-            $stmt = $pdo->query("SELECT id, name FROM stamps ORDER BY id ASC");
-            $stamps = $stmt->fetchAll(\PDO::FETCH_OBJ);
-
-            // 4. 教師自身が既にスタンプを押しているかチェック
+            // 4. 教師自身が既にスタンプを押しているかチェック (コレクション操作でチェック)
             $currentTeacherStamped = false;
             foreach ($readHistory as $history) {
                 if ($history->teacher_name == $teacher->name) {
@@ -202,7 +150,7 @@ class TeacherController extends Controller
             }
 
             return view('teachers.teacher_read_entry', compact('teacher', 'entry', 'readHistory', 'stamps', 'currentTeacherStamped'));
-        } catch (\PDOException $e) {
+        } catch (\Exception $e) {
             error_log("readEntry DB Error: " . $e->getMessage());
             return "データベースエラーが発生しました。";
         }
@@ -215,62 +163,27 @@ class TeacherController extends Controller
      */
     public function stampEntry(Request $request, int $id)
     {
-        global $pdo;
-        $loggedInUserId = $_SESSION['user_id'] ?? null;
+        $teacher = $this->checkAuth();
+        if (!$teacher) return; // checkAuth内でリダイレクト済み
 
-        if (!$this->getTeacherData($loggedInUserId)) {
-            // 書き方直す
-            header("Location: /login/teacher");
-            exit;
-        }
-
+        $loggedInUserId = $teacher->id;
         $stampId = $request->get('stamp_id');
 
-        if (!is_numeric($stampId) || $stampId <= 0) {
+        $redirectRoute = 'teachers.read'; // ルート名が teachers/read/{id}★要確認
+
+        if (!is_numeric($stampId) || (int)$stampId <= 0) {
             // エラー処理（スタンプIDが無効）
             $_SESSION['error_message'] = "無効なスタンプが選択されました。";
-            // 書き方直す
-            header("Location: /teachers/read/{$id}");
+            // 元のコードに合わせて、生リダイレクトとexitを使用
+            return redirect()->route($redirectRoute, ['id' => $id])->with('error_message', "無効なスタンプが選択されました。");
             exit;
         }
 
-        try {
-            // トランザクション開始
-            $pdo->beginTransaction();
-
-            // 1. read_histories に新しいスタンプ記録を挿入
-            // (entry_id, teacher_id, stamp_id) の複合ユニークキーにより、同じ教師が同じエントリーに同じスタンプを二重に押すのを防止
-            $stmt = $pdo->prepare("
-                INSERT IGNORE INTO read_histories (entry_id, teacher_id, stamp_id, stamped_at)
-                VALUES (:entry_id, :teacher_id, :stamp_id, NOW())
-            ");
-            $stmt->execute([
-                ':entry_id' => $id,
-                ':teacher_id' => $loggedInUserId,
-                ':stamp_id' => $stampId,
-            ]);
-
-            // 2. entries テーブルの is_read フラグを 1 に更新
-            $stmt = $pdo->prepare("UPDATE entries SET is_read = 1 WHERE id = :id");
-            $stmt->execute([':id' => $id]);
-
-            // コミット
-            $pdo->commit();
-
-            $_SESSION['success_message'] = "スタンプが正常に押印されました。";
-        } catch (\PDOException $e) {
-            $pdo->rollBack();
-            error_log("stampEntry DB Error: " . $e->getMessage());
-            $_SESSION['error_message'] = "スタンプ押印中にエラーが発生しました。";
+        //トランザクション処理を含むDB操作
+        if (Teacher::stampEntry($id, $loggedInUserId, (int)$stampId)) {
+            return redirect()->route($redirectRoute, ['id' => $id])->with('success_message', "スタンプが正常に押印されました。");
+        } else {
+            return redirect()->route($redirectRoute, ['id' => $id])->with('error_message', "スタンプ押印中にエラーが発生しました。");
         }
-
-        // 詳細画面に戻る
-        // 書き方直す
-        header("Location: /teachers/read/{$id}");
-        exit;
-    }
-
-    public function past()
-    { /* ... */
     }
 }
