@@ -53,18 +53,21 @@
         <div class="pt-6 border-t border-gray-200">
             <h3 class="text-xl font-semibold text-gray-700 mb-4">先生からの確認・スタンプ履歴</h3>
 
-            
             <?php if($readHistory && $readHistory->count() > 0): ?>
             <?php $__currentLoopData = $readHistory; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $history): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php if (! (is_object($history))): ?>
+            <?php continue; ?>
+            <?php endif; ?>
             <div class="flex items-center space-x-3 mb-2 p-3 bg-white rounded-lg border border-gray-100 shadow-sm">
                 <span class="text-2xl" role="img" aria-label="Stamp">
-                    
                     <?php if($history->stamp_name == 'イイネ'): ?> 👍 <?php elseif($history->stamp_name == '頑張ったね'): ?> ✨ <?php elseif($history->stamp_name == 'お大事に'): ?> 🍀 <?php else: ?> 🏷️ <?php endif; ?>
                 </span>
                 <div class="flex-1">
                     <span class="font-bold text-sm text-gray-800"><?php echo e($history->stamp_name); ?></span>
                     
-                    <span class="text-xs text-gray-500 ml-2">(<?php echo e($history->teacher->name ?? '不明な先生'); ?>)</span>
+                    <span class="text-xs text-gray-500 ml-2">
+                        (<?php echo e($history->teacher->name ?? '不明な先生'); ?>)
+                    </span>
                 </div>
                 <span class="text-xs text-gray-400">
                     <?php echo e(date('Y-m-d H:i', strtotime($history->stamped_at))); ?>

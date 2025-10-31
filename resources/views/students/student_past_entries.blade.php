@@ -1,10 +1,3 @@
-@php
-// $currentMonth (例: '2025-10') を DateTime オブジェクトに変換
-$dateObj = DateTime::createFromFormat('Y-m', $currentMonth);
-// 'Y年n月' の形式にフォーマット
-$displayCurrentMonth = $dateObj ? $dateObj->format('Y年n月') : $currentMonth;
-@endphp
-
 @extends('layouts.dashboard')
 
 @section('title', '提出済み連絡帳一覧')
@@ -22,7 +15,7 @@ $displayCurrentMonth = $dateObj ? $dateObj->format('Y年n月') : $currentMonth;
                 <i class="fas fa-chevron-left"></i> 前月へ
             </a>
             <h2 class="text-xl md:text-2xl font-bold text-indigo-800">
-                {{ $displayCurrentMonth }} の連絡帳
+                {{ $displayMonth }} の連絡帳
             </h2>
             <a href="?month={{ $nextMonth }}" class="text-indigo-600 hover:text-indigo-800 transition duration-150 @if($isFutureMonth) opacity-50 cursor-default @endif">
                 次月へ <i class="fas fa-chevron-right"></i>
@@ -35,7 +28,7 @@ $displayCurrentMonth = $dateObj ? $dateObj->format('Y年n月') : $currentMonth;
             {{-- データがない場合の表示 --}}
             <div class="p-8 text-center bg-gray-100 rounded-lg border-2 border-dashed border-gray-300">
                 <p class="text-gray-600 text-lg font-medium">
-                    {{ $displayCurrentMonth }}の提出履歴はありません。
+                    {{ $displayMonth }}の提出履歴はありません。
                 </p>
             </div>
             @else

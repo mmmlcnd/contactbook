@@ -53,18 +53,21 @@
         <div class="pt-6 border-t border-gray-200">
             <h3 class="text-xl font-semibold text-gray-700 mb-4">先生からの確認・スタンプ履歴</h3>
 
-            {{-- $readHistory は Controller で Eager Load された Entry->readHistories から渡されています --}}
             @if ($readHistory && $readHistory->count() > 0)
             @foreach ($readHistory as $history)
+            @unless (is_object($history))
+            @continue
+            @endunless
             <div class="flex items-center space-x-3 mb-2 p-3 bg-white rounded-lg border border-gray-100 shadow-sm">
                 <span class="text-2xl" role="img" aria-label="Stamp">
-                    {{-- スタンプ名は stamp_name カラムから取得できることを前提とします --}}
                     @if ($history->stamp_name == 'イイネ') 👍 @elseif ($history->stamp_name == '頑張ったね') ✨ @elseif ($history->stamp_name == 'お大事に') 🍀 @else 🏷️ @endif
                 </span>
                 <div class="flex-1">
                     <span class="font-bold text-sm text-gray-800">{{ $history->stamp_name }}</span>
-                    {{-- teacher リレーションから先生名を取得 (ControllerでEager Load済み) --}}
-                    <span class="text-xs text-gray-500 ml-2">({{ $history->teacher->name ?? '不明な先生' }})</span>
+                    {{-- teacher リレーションから先生名を取得 --}}
+                    <span class="text-xs text-gray-500 ml-2">
+                        ({{ $history->teacher->name ?? '不明な先生' }})
+                    </span>
                 </div>
                 <span class="text-xs text-gray-400">
                     {{ date('Y-m-d H:i', strtotime($history->stamped_at)) }}

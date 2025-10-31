@@ -155,14 +155,46 @@ class StudentController extends Controller
         }
 
         // 表示月（URLクエリパラメータを優先、なければ今月）
-        $selectedMonth = $request->input('month') ?? Carbon::now()->format('Y-m');
-        $date = Carbon::createFromFormat('Y-m', $selectedMonth);
+        $selectedMonth = $request->input('month');
 
+        // 比較の基準となる今月の1日を確定
+        $currentMonthBase = Carbon::today()->startOfMonth();
+
+        $date = $currentMonthBase->copy();
+
+        // ユーザーが指定した月が存在し、形式が正しいかチェック
+        if ($selectedMonth && preg_match('/^\d{4}-\d{2}$/', $selectedMonth)) {
+            try {
+                $timezone = 'Asia/Tokyo';
+
+                $monthWithDay = $selectedMonth . '-01';
+                $parsedDate = Carbon::createFromFormat('Y-m-d', $monthWithDay, $timezone);
+
+                // パースが成功し、Carbonインスタンスであることを確認
+                if ($parsedDate instanceof Carbon) {
+                    $date = $parsedDate->startOfMonth();
+                } else {
+                    // 失敗した場合は例外を投げてcatchさせる
+                    throw new \Exception("Carbon parsing failed for month: {$selectedMonth}");
+                }
+            } catch (\Exception $e) {
+                // パースエラーの場合、エラーログを出力し、デフォルト（今月）を使用
+                error_log("showPastEntries: Failed to parse month parameter '" . $selectedMonth . "': " . $e->getMessage());
+                // $date はデフォルトのまま（現在の月）
+            }
+        }
+
+        // 2. 月ナビゲーション用の計算
         $currentMonth = $date->format('Y-m');
         $previousMonth = $date->copy()->subMonth()->format('Y-m');
         $nextMonth = $date->copy()->addMonth()->format('Y-m');
-        $isFutureMonth = $date->isFuture() && !$date->isSameMonth(Carbon::now());
-        $displayMonth = $date->format('Y年n月');
+
+        // 3. 次月ボタンの無効化チェック
+        // 次月を示すCarbonオブジェクトを取得
+        $timezone = 'Asia/Tokyo';
+        $nextMonthObj = Carbon::createFromFormat('Y-m', $nextMonth)->startOfMonth();
+
+        $isFutureMonth = $nextMonthObj->greaterThan($currentMonthBase);
 
         // Studentモデルのリレーション (entries()) を通じてEntryを取得
         $entries = $student->entries()
@@ -195,7 +227,7 @@ class StudentController extends Controller
             'previousMonth' => $previousMonth,
             'nextMonth' => $nextMonth,
             'isFutureMonth' => $isFutureMonth,
-            'displayMonth' => $displayMonth,
+            'displayMonth' => $date->format('Y年n月'),
             'title' => '提出履歴',
         ]);
     }
@@ -210,24 +242,31 @@ class StudentController extends Controller
 
         $studentId = $this->getStudentId();
 
-        // 連絡帳をIDとログイン中の生徒IDで取得し、readHistoriesリレーションをEager Load
-        $entry = Entry::getForStudentDetail($id, $studentId);
+        try {
+            $entry = Entry::forStudentDetail() // カスタムスコープで必要なリレーションをEager Load
+                ->where('id', $id)
+                ->where('student_id', $studentId)
+                ->first();
 
-        // 連絡帳が見つからない、または他の生徒のエントリーであればリダイレクト
-        if (!$entry) {
-            $_SESSION['error_message'] = '指定された連絡帳が見つかりませんでした。';
+            // 連絡帳が見つからない、または他の生徒のエントリーであればエラーログを出力
+            if (!$entry) {
+                error_log("Entry not found or unauthorized access: Entry ID={$id}, Student ID={$studentId}");
+                $_SESSION['error_message'] = '指定された連絡帳が見つかりませんでした。';
+                return redirect()->route('students.entries.past');
+            }
+
+            // ビューに$entryと$readHistoryを渡す
+            return view('students.student_entry_detail', [
+                'entry' => $entry,
+                'readHistory' => $entry->readHistories, // モデルのスコープでロード済み
+                'title' => '連絡帳詳細',
+            ]);
+        } catch (\Exception $e) {
+            // データベースエラーやその他の予期せぬエラーが発生した場合
+            error_log("500 Server Error in showEntryDetail: Entry ID={$id}, Error: " . $e->getMessage());
+            $_SESSION['error_message'] = 'データの取得中に致命的なエラーが発生しました。';
             return redirect()->route('students.entries.past');
         }
-
-        // ビューは $entry と $readHistory を期待しているので変数を準備
-        $readHistory = $entry->readHistories;
-
-        // ビューには $entry と $readHistory を渡します。
-        return view('students.student_entry_detail', [
-            'entry' => $entry,
-            'readHistory' => $readHistory, // Entryモデルのリレーションで取得済み
-            'title' => '連絡帳詳細',
-        ]);
     }
 
     /**
