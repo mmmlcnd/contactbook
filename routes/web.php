@@ -58,15 +58,15 @@ Route::prefix('teachers')->group(function () {
     // 教師用ダッシュボード
     Route::get('dashboard', [TeacherController::class, 'dashboard'])->name('teachers.dashboard');
     // 提出状況一覧画面（担当クラス）
-    Route::get('status', [TeacherController::class, 'showSubmissionList'])->name('teachers.status');
+    // Route::get('status', [TeacherController::class, 'showSubmissionList'])->name('teachers.status');
     // 既読処理画面用 (GET /teachers/read/{id})
-    Route::get('read/{id}', [TeacherController::class, 'readEntry'])
-        ->where('id', '[0-9]+');
+    // Route::get('read/{id}', [TeacherController::class, 'readEntry'])
+    // ->where('id', '[0-9]+');
     // スタンプ押印処理 (POST /teachers/stamp/{id})
-    Route::post('stamp/{id}', [TeacherController::class, 'stampEntry'])
-        ->where('id', '[0-9]+');
+    // Route::post('stamp/{id}', [TeacherController::class, 'stampEntry'])
+    // ->where('id', '[0-9]+');
     // 過去提出記録一覧画面（担当クラス）
-    Route::get('entries/past', [TeacherController::class, 'past'])->name('teachers.entries.past');
+    // Route::get('entries/past', [TeacherController::class, 'past'])->name('teachers.entries.past');
 });
 
 // --------------------
